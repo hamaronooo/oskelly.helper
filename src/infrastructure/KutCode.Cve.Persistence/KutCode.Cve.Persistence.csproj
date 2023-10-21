@@ -16,6 +16,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\..\core\KutCode.Cve.Application\KutCode.Cve.Application.csproj" />
       <ProjectReference Include="..\..\core\KutCode.Cve.Domain\KutCode.Cve.Domain.csproj" />
     </ItemGroup>
 

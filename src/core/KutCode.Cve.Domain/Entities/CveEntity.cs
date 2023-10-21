@@ -1,12 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using KutCode.Cve.Domain.Models;
 
 namespace KutCode.Cve.Domain.Entities;
 
-/// <summary>
-/// Common Vulnerabilities and Exposures
-/// </summary>
+[Description("Common Vulnerabilities and Exposures")]
 [Table("cve")]
 public sealed class CveEntity 
 {
@@ -24,30 +22,35 @@ public sealed class CveEntity
 		CnaNumber = cnaNumber;
 	}
 
-	/// <summary>
-	/// CVE-XXXX representation. Primary key.
-	/// </summary>
+	[Description("CVE-XXXX representation. Primary key.")]
 	[Column("year")]
 	public int Year { get; set; }
-	/// <summary>
-	/// CVE-...-XXXX representation. Primary key.
-	/// </summary>
+	
+	[Description(" CVE-...-XXXX representation. Primary key.")]
 	[Column("cna_number"), MaxLength(20)]
 	public string CnaNumber { get; set; }
 
 	[NotMapped] public CveId CveId => new(Year, CnaNumber);
 
-	/// <summary>
-	/// Description of CVE properties and effects
-	/// </summary>
-	[Column("description")]
-	public string? Description { get; init; }
+	[Description("CVE short name representation")]
+	[Column("short_name")]
+	public string? ShortName { get; set; }
+	
+	[Description("English description of CVE properties and effects")]
+	[Column("description_en")]
+	public string? DescriptionEnglish { get; init; }
+	
+	[Description("Russian description of CVE properties and effects")]
+	[Column("description_ru")]
+	public string? DescriptionRussian { get; init; }
 
-	/// <summary>
-	/// Common Vulnerability Scoring System
-	/// </summary>
+	[Description("Common Vulnerability Scoring System")]
 	[Column("cvss")]
 	public double? CVSS { get; init; }
+	
+	[Description("Locked with update (or something else) process")]
+	[Column("locked")]
+	public bool Locked { get; set; }
 
 	public ICollection<VulnerabilityPointEntity> Vulnerabilities { get; set; } = new List<VulnerabilityPointEntity>();
 

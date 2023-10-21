@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace KutCode.Cve.Persistence.Migrations
 {
     [DbContext(typeof(MainDbContext))]
-    [Migration("20231021074724_Initial")]
+    [Migration("20231021154820_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -40,9 +40,21 @@ namespace KutCode.Cve.Persistence.Migrations
                         .HasColumnType("double precision")
                         .HasColumnName("cvss");
 
-                    b.Property<string>("Description")
+                    b.Property<string>("DescriptionEnglish")
                         .HasColumnType("text")
-                        .HasColumnName("description");
+                        .HasColumnName("description_en");
+
+                    b.Property<string>("DescriptionRussian")
+                        .HasColumnType("text")
+                        .HasColumnName("description_ru");
+
+                    b.Property<bool>("Locked")
+                        .HasColumnType("boolean")
+                        .HasColumnName("locked");
+
+                    b.Property<string>("ShortName")
+                        .HasColumnType("text")
+                        .HasColumnName("short_name");
 
                     b.HasKey("Year", "CnaNumber");
 

@@ -37,9 +37,21 @@ namespace KutCode.Cve.Persistence.Migrations
                         .HasColumnType("double precision")
                         .HasColumnName("cvss");
 
-                    b.Property<string>("Description")
+                    b.Property<string>("DescriptionEnglish")
                         .HasColumnType("text")
-                        .HasColumnName("description");
+                        .HasColumnName("description_en");
+
+                    b.Property<string>("DescriptionRussian")
+                        .HasColumnType("text")
+                        .HasColumnName("description_ru");
+
+                    b.Property<bool>("Locked")
+                        .HasColumnType("boolean")
+                        .HasColumnName("locked");
+
+                    b.Property<string>("ShortName")
+                        .HasColumnType("text")
+                        .HasColumnName("short_name");
 
                     b.HasKey("Year", "CnaNumber");
 

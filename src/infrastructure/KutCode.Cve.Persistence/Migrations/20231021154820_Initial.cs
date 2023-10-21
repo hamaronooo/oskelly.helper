@@ -17,8 +17,11 @@ namespace KutCode.Cve.Persistence.Migrations
                 {
                     year = table.Column<int>(type: "integer", nullable: false),
                     cna_number = table.Column<string>(type: "character varying(20)", maxLength: 20, nullable: false),
-                    description = table.Column<string>(type: "text", nullable: true),
-                    cvss = table.Column<double>(type: "double precision", nullable: true)
+                    short_name = table.Column<string>(type: "text", nullable: true),
+                    description_en = table.Column<string>(type: "text", nullable: true),
+                    description_ru = table.Column<string>(type: "text", nullable: true),
+                    cvss = table.Column<double>(type: "double precision", nullable: true),
+                    locked = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {

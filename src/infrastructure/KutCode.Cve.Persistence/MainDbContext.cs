@@ -22,7 +22,6 @@ public class MainDbContext : DbContext
 	protected override void OnModelCreating(ModelBuilder mb)
 	{
 		mb.Entity<CveEntity>().HasKey(x => new { x.Year, x.CnaNumber });
-			
 
 		mb.Entity<CveEntity>().HasMany(x => x.Vulnerabilities)
 			.WithOne(x => x.Cve)
