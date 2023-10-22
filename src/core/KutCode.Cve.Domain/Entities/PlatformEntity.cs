@@ -16,7 +16,7 @@ public sealed class PlatformEntity : ModelWithId<Guid>
 	[Column("name")]
 	public string Name { get; set; }
 	[Column("platform_type")]
-	public PlatformType PlatformType { get; init; } = PlatformType.Other;
+	public PlatformType PlatformType { get; set; } = PlatformType.Unknown;
 
 	public ICollection<VulnerabilityPointEntity> VulnerabilityPoints { get; set; }
 	

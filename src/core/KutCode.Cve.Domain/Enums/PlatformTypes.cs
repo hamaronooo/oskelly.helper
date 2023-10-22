@@ -3,8 +3,8 @@
 [Flags]
 public enum PlatformType
 {
-	Windows = 1,
-	Linux = 2,
-	MacOs = 4,
-	Other = 8
+	Unknown = 1,
+	Windows = 2,
+	Linux = 4,
+	Apple = 8,
 }

@@ -1,4 +1,6 @@
-﻿namespace KutCode.Cve.Application.Interfaces;
+﻿using KutCode.Cve.Domain.Dto.Entities;
+
+namespace KutCode.Cve.Application.Interfaces;
 
 /// <summary>
 /// Load raw CVE main fields and it descriptions 

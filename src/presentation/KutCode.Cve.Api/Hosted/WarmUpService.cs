@@ -1,4 +1,4 @@
-﻿using KutCode.Cve.Persistence;
+﻿using KutCode.Cve.Application.Database;
 using Microsoft.EntityFrameworkCore;
 
 namespace KutCode.Cve.Api.Hosted;

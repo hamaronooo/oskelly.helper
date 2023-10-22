@@ -8,7 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\src\infrastructure\KutCode.Cve.Loaders\KutCode.Cve.Loaders.csproj" />
+      <ProjectReference Include="..\..\src\infrastructure\KutCode.Cve.Services\KutCode.Cve.Services.csproj" />
     </ItemGroup>
 
 </Project>

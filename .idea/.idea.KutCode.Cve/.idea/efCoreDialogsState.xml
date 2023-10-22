@@ -3,10 +3,11 @@
   <component name="EfCoreDialogsState">
     <option name="keyValueStorage">
       <map>
-        <entry key="Common:7b18612b-32a1-4284-b8a6-52affd997a25:dbContext" value="KutCode.Cve.Persistence.MainDbContext" />
+        <entry key="Common:7b18612b-32a1-4284-b8a6-52affd997a25:dbContext" value="KutCode.Cve.Persistence.Database.MainDbContext" />
         <entry key="Common:buildConfiguration" value="Debug" />
+        <entry key="Common:d391a3e7-6aca-4bbd-be0f-6d5c413c9fc7:dbContext" value="KutCode.Cve.Application.Database.MainDbContext" />
         <entry key="Common:noBuild" value="false" />
-        <entry key="Common:outputFolder" value="Migrations" />
+        <entry key="Common:outputFolder" value="Database\Migrations" />
         <entry key="Common:useDefaultConnection" value="true" />
       </map>
     </option>

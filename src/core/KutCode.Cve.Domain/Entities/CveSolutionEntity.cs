@@ -12,8 +12,8 @@ public sealed class CveSolutionEntity : ModelWithId<Guid>
 	public CveSolutionEntity() { }
 	public CveSolutionEntity(Guid uid) : base(uid) { }
 	
-	[Column("name")]
-	public string Name { get; init; }
+	[Column("info")]
+	public string Info { get; init; }
 	
 	/// <summary>
 	/// Text description of solution
@@ -24,6 +24,9 @@ public sealed class CveSolutionEntity : ModelWithId<Guid>
 	[Column("solution_link")]
 	public string? SolutionLink { get; init; }
 	
+	[Column("download_link")]
+	public string? DownloadLink { get; init; }
+	
 	[Column("additional_link")]
 	public string? AdditionalLink { get; init; }
 
@@ -31,5 +34,5 @@ public sealed class CveSolutionEntity : ModelWithId<Guid>
 	public Guid VulnerabilityPointId { get; set; }
 	public VulnerabilityPointEntity VulnerabilityPoint { get; set; }
 	
-	public override string ToString() => Name;
+	public override string ToString() => Info;
 }

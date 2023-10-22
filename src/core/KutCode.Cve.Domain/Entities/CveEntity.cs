@@ -44,9 +44,9 @@ public sealed class CveEntity
 	[Column("description_ru")]
 	public string? DescriptionRussian { get; init; }
 
-	[Description("Common Vulnerability Scoring System")]
-	[Column("cvss")]
-	public double? CVSS { get; init; }
+	[Description("Common Vulnerability Scoring System, maximum rate (may be based on few sources)")]
+	[Column("cvss_max_rate")]
+	public double? CvssMaximumRate { get; init; }
 	
 	[Description("Locked with update (or something else) process")]
 	[Column("locked")]

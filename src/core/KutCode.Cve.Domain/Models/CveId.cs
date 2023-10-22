@@ -39,6 +39,7 @@ public readonly struct CveId
 	}
 
 	public string AsString => $"CVE-{_year}-{_cnaNumber}";
+	public string AsStringWithoutPrefix => $"{_year}-{_cnaNumber}";
 
 	/// <summary>
 	/// Year of CVE publication<br/>
@@ -53,4 +54,13 @@ public readonly struct CveId
 	public string CnaNumber => _cnaNumber;
 
 	public override string ToString() => AsString;
+	
+	public static bool operator ==(CveId a, CveId b)
+	{
+		if (Equals(a, b))
+			return true;
+		return a._year == b._year && a._cnaNumber == b._cnaNumber;
+	}
+
+	public static bool operator !=(CveId a, CveId b) => !(a == b);
 }
