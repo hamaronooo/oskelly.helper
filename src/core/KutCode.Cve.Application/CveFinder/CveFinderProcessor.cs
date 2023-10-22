@@ -1,4 +1,5 @@
-﻿using KutCode.Cve.Application.CQRS.Cve;
+﻿using System.Diagnostics;
+using KutCode.Cve.Application.CQRS.Cve;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
@@ -9,6 +10,7 @@ public class CveFinderProcessor
 {
 	private readonly IMediator _mediatr;
 	private readonly IFinderQueueManager _finderQueueManager;
+	private const int LoadBunchCount = 100;
 	public CveFinderProcessor(IServiceScopeFactory scopeFactory)
 	{
 		var scope = scopeFactory.CreateScope();
@@ -35,8 +37,10 @@ public class CveFinderProcessor
 
 	private async Task LoadNextAsync(CancellationToken ct)
 	{
-		var next = await _finderQueueManager.GetNextAsync(100);
-		foreach (var nextItem in next) {
+		var next = await _finderQueueManager.GetNextAsync(LoadBunchCount);
+		var ts1 = Stopwatch.GetTimestamp();
+		foreach (var nextItem in next)
+		{
 			Log.Information("{ClassName}; Start finding resolves for CVE: {Cve} with finder code: {FCode}", 
 				GetType().Name, nextItem.CveId, nextItem.FinderCode);
 			try {
@@ -46,6 +50,9 @@ public class CveFinderProcessor
 				Log.Error(e, "Error in cve finder work, cve: {CveId}; finder: {FinderCode}", nextItem.CveId, nextItem.FinderCode);
 			}
 		}
+		
+		Log.Information("{ClassName}; Loaded {Count} CVE for {Elapsed} time", 
+			GetType().Name, LoadBunchCount, Stopwatch.GetElapsedTime(ts1, Stopwatch.GetTimestamp()));
 		await _finderQueueManager.RemoveRangeAsync(next, ct);
 	}
 }
