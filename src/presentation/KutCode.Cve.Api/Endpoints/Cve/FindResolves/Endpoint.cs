@@ -1,17 +1,17 @@
 ﻿using FastEndpoints;
-using KutCode.Cve.Application.MQ;
+using KutCode.Cve.Application.Interfaces;
+using KutCode.Cve.Domain.Entities;
 using KutCode.Cve.Domain.Models;
-using MassTransit;
 
 namespace KutCode.Cve.Api.Endpoints.Cve.FindResolves;
 
 public class Endpoint : Endpoint<Request>
 {
-	private readonly IPublishEndpoint _publishEndpoint;
+	private readonly IFinderQueueManager _manager;
 
-	public Endpoint(IPublishEndpoint publishEndpoint)
+	public Endpoint(IFinderQueueManager manager)
 	{
-		_publishEndpoint = publishEndpoint;
+		_manager = manager;
 	}
 
 	public override void Configure()
@@ -24,11 +24,9 @@ public class Endpoint : Endpoint<Request>
 	public override async Task HandleAsync(Request req, CancellationToken ct)
 	{
 		ThrowIfAnyErrors();
-		foreach (var item in req.Items)
-		{
-			var id = CveId.Parse(item.CveId);
-			await _publishEndpoint.Publish(new FindCveResolveMessage(id.Year, id.CnaNumber, item.SourceCode));
-		}
+		List<CveFinderQueueEntity> list = req.Items.Select(x
+			=> new CveFinderQueueEntity(CveId.Parse(x.CveId), x.SourceCode, 10)).ToList();
+		await _manager.AddRangeAsync(list, ct);
 		await SendOkAsync(ct);
 	}
 }

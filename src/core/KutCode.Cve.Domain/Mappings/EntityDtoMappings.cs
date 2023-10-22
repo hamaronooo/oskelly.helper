@@ -8,7 +8,9 @@ public sealed class EntityDtoMappings : Profile
 {
 	public EntityDtoMappings()
 	{
-		CreateMap<CveEntity, CveDto>();
+		CreateMap<CveEntity, CveDto>()
+			.ForMember(x =>x.CveId, opts => 
+				opts.MapFrom(x => x.CveId));
 		CreateMap<SoftwareEntity, SoftwareDto>();
 		CreateMap<PlatformEntity, PlatformDto>();
 		CreateMap<VulnerabilityPointEntity, VulnerabilityPointDto>();

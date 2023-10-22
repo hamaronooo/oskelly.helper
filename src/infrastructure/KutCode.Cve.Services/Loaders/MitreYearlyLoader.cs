@@ -25,7 +25,10 @@ public class MitreYearlyLoader : ICveLoader
 			var rawDescription = vul.Descendants()
 				.FirstOrDefault(x =>x.Name.LocalName == "Note" && x.Attribute("Type")?.Value.ToLower() == "description")?.Value;
 			if (string.IsNullOrEmpty(rawDescription)) continue;
-			response.Add(new CveDto(cveId, null, rawDescription));
+			response.Add(new CveDto
+			{
+				CveId = cveId, DescriptionEnglish = rawDescription
+			});
 		}
 		return response;
 	}

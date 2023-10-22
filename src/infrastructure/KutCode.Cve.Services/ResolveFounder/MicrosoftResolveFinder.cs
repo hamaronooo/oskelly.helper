@@ -35,7 +35,7 @@ public sealed class MicrosoftResolveFinder : IResolveFinder
 				DataSourceCode = FinderCode,
 				Impact = item.Impact,
 				Platform = platform,
-				Software = software,
+				Software = software?.Name == platform?.Name ? null : software,
 				CveSolutions = solutions
 			});
 		}

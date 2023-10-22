@@ -29,6 +29,21 @@ namespace KutCode.Cve.Application.Database.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "cve_finder_queue",
+                columns: table => new
+                {
+                    cve_year = table.Column<int>(type: "integer", nullable: false),
+                    cve_cna_number = table.Column<string>(type: "text", nullable: false),
+                    finder_code = table.Column<string>(type: "text", nullable: false),
+                    priority = table.Column<int>(type: "integer", nullable: false),
+                    sys_created = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_cve_finder_queue", x => new { x.cve_year, x.cve_cna_number, x.finder_code });
+                });
+
+            migrationBuilder.CreateTable(
                 name: "platform",
                 columns: table => new
                 {
@@ -140,6 +155,9 @@ namespace KutCode.Cve.Application.Database.Migrations
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "cve_finder_queue");
+
             migrationBuilder.DropTable(
                 name: "cve_solution");
 

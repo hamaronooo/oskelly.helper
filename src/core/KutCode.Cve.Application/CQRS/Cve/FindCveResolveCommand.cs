@@ -9,6 +9,7 @@ public sealed record FindCveResolveCommand(CveId CveId, string FinderCode) : IRe
 public class FindCveResolveCommandHandler : IRequestHandler<FindCveResolveCommand>
 {
 	private readonly IResolveFinderManager _finderManager;
+	private readonly ICveCache _cveCache;
 	private readonly IEntityCacheService<SoftwareEntity, Guid> _softwareCache;
 	private readonly IEntityCacheService<PlatformEntity, Guid> _platformCache;
 	private readonly MainDbContext _context;
@@ -17,12 +18,14 @@ public class FindCveResolveCommandHandler : IRequestHandler<FindCveResolveComman
 		IResolveFinderManager finderManager, 
 		IEntityCacheService<SoftwareEntity, Guid> softwareCache,
 		IEntityCacheService<PlatformEntity, Guid> platformCache, 
-		MainDbContext context)
+		MainDbContext context,
+        ICveCache cveCache)
 	{
 		_finderManager = finderManager;
 		_softwareCache = softwareCache;
 		_platformCache = platformCache;
 		_context = context;
+		_cveCache = cveCache;
 	}
 
 	public async Task Handle(FindCveResolveCommand request, CancellationToken ct)
@@ -33,6 +36,8 @@ public class FindCveResolveCommandHandler : IRequestHandler<FindCveResolveComman
 			return;
 		}
 
+		if (_cveCache.IsExist(request.CveId) is false) return;
+		
 		int addCounter = 0;
 		var finderResult = await finder.FindAsync(request.CveId, ct);
 		foreach (var found in finderResult)

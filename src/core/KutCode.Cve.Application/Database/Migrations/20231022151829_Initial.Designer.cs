@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace KutCode.Cve.Application.Database.Migrations
 {
     [DbContext(typeof(MainDbContext))]
-    [Migration("20231022111635_Initial")]
+    [Migration("20231022151829_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -59,6 +59,33 @@ namespace KutCode.Cve.Application.Database.Migrations
                     b.HasKey("Year", "CnaNumber");
 
                     b.ToTable("cve");
+                });
+
+            modelBuilder.Entity("KutCode.Cve.Domain.Entities.CveFinderQueueEntity", b =>
+                {
+                    b.Property<int>("CveYear")
+                        .HasColumnType("integer")
+                        .HasColumnName("cve_year");
+
+                    b.Property<string>("CveCnaNumber")
+                        .HasColumnType("text")
+                        .HasColumnName("cve_cna_number");
+
+                    b.Property<string>("FinderCode")
+                        .HasColumnType("text")
+                        .HasColumnName("finder_code");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("integer")
+                        .HasColumnName("priority");
+
+                    b.Property<DateTime>("SysCreated")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("sys_created");
+
+                    b.HasKey("CveYear", "CveCnaNumber", "FinderCode");
+
+                    b.ToTable("cve_finder_queue");
                 });
 
             modelBuilder.Entity("KutCode.Cve.Domain.Entities.CveSolutionEntity", b =>

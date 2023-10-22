@@ -1,22 +1,18 @@
 ﻿using FastEndpoints;
-using KutCode.Cve.Application.Database;
+using KutCode.Cve.Application.Interfaces;
 using KutCode.Cve.Application.MQ;
-using KutCode.Cve.Domain.Models;
-using MassTransit;
-using Microsoft.EntityFrameworkCore;
 
 namespace KutCode.Cve.Api.Endpoints.Cve.FindYearlyResolves;
 
 public class Endpoint : Endpoint<Request>
 {
-	private readonly IPublishEndpoint _publishEndpoint;
-	private readonly MainDbContext _context;
+	private readonly IFinderQueueManager _manager;
 
-	public Endpoint(IPublishEndpoint publishEndpoint, MainDbContext context)
+	public Endpoint(IFinderQueueManager manager)
 	{
-		_publishEndpoint = publishEndpoint;
-		_context = context;
+		_manager = manager;
 	}
+
 
 	public override void Configure()
 	{
@@ -28,9 +24,7 @@ public class Endpoint : Endpoint<Request>
 	public override async Task HandleAsync(Request req, CancellationToken ct)
 	{
 		ThrowIfAnyErrors();
-		var cves = await _context.Cve.Where(x => x.Year == req.Year).Select(x => x.CveId).ToListAsync();
-		foreach (var item in cves)
-			await _publishEndpoint.Publish(new FindCveResolveMessage(item.Year, item.CnaNumber, req.SourceCode));
+		await _manager.AddByYearAsync(req.Year, req.SourceCode, 0);
 		await SendOkAsync(ct);
 	}
 }

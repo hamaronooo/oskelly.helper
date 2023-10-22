@@ -1,4 +1,5 @@
-﻿using KutCode.Cve.Application.Database;
+﻿using KutCode.Cve.Application.CveFinder;
+using KutCode.Cve.Application.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -11,6 +12,12 @@ public static class DependencyInjection
 		services.AddDbContext<MainDbContext>(x => {
 			x.UseNpgsql(connectionString);
 		});
+		return services;
+	}
+	
+	public static IServiceCollection AddCveFinderProcessor(this IServiceCollection services)
+	{
+		services.AddSingleton<CveFinderProcessor>();
 		return services;
 	}
 }

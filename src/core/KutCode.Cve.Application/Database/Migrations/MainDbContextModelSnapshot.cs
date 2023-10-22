@@ -58,6 +58,33 @@ namespace KutCode.Cve.Application.Database.Migrations
                     b.ToTable("cve");
                 });
 
+            modelBuilder.Entity("KutCode.Cve.Domain.Entities.CveFinderQueueEntity", b =>
+                {
+                    b.Property<int>("CveYear")
+                        .HasColumnType("integer")
+                        .HasColumnName("cve_year");
+
+                    b.Property<string>("CveCnaNumber")
+                        .HasColumnType("text")
+                        .HasColumnName("cve_cna_number");
+
+                    b.Property<string>("FinderCode")
+                        .HasColumnType("text")
+                        .HasColumnName("finder_code");
+
+                    b.Property<int>("Priority")
+                        .HasColumnType("integer")
+                        .HasColumnName("priority");
+
+                    b.Property<DateTime>("SysCreated")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("sys_created");
+
+                    b.HasKey("CveYear", "CveCnaNumber", "FinderCode");
+
+                    b.ToTable("cve_finder_queue");
+                });
+
             modelBuilder.Entity("KutCode.Cve.Domain.Entities.CveSolutionEntity", b =>
                 {
                     b.Property<Guid>("Id")

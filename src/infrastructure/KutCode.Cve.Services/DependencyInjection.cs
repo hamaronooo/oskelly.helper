@@ -20,6 +20,8 @@ public static class DependencyInjection
 		services.AddScoped<MicrosoftResolveFinder>();
 		services.AddSingleton<IEntityCacheService<SoftwareEntity, Guid>, SoftwareCacheService>();
 		services.AddSingleton<IEntityCacheService<PlatformEntity, Guid>, PlatformCacheService>();
+		services.AddSingleton<ICveCache, CveCacheService>();
+		services.AddScoped<IFinderQueueManager, FinderQueueManagerService>();
 		return services;
 	} 
 }

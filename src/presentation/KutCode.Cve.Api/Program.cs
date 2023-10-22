@@ -4,19 +4,23 @@ using FastEndpoints.Swagger;
 using KutCode.Cve.Api.Configuration;
 using KutCode.Cve.Api.Hosted;
 using KutCode.Cve.Application;
+using KutCode.Cve.Application.Database;
 using KutCode.Cve.Services;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.AddFastEndpoints()
+	.ConfigureCors()
 	.ConfigureSwagger()
-	.ConfigureSerilogLogging()
-	.AddMassTransitConfiguration();
-builder.Services.AddMediatR(x => x.RegisterServicesFromAssemblies(typeof(KutCode.Cve.Application.AssemblyInfo).Assembly));
+	.ConfigureSerilogLogging();
 
+builder.Services.AddMediatR(x => x.RegisterServicesFromAssemblies(typeof(KutCode.Cve.Application.AssemblyInfo).Assembly));
 builder.Services.AddMainDbContext(builder.Configuration.GetConnectionString("Main")!);
 builder.Services.AddHostedService<WarmUpService>();
+builder.Services.AddHostedService<LoaderProcessorService>();
+builder.Services.AddCveFinderProcessor();
 builder.Services.AddServices();
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
@@ -30,6 +34,8 @@ app.UseRequestLocalization();
 app.UseAuthentication();
 app.UseAuthorization();
 
+app.UseCors(CorsConfiguration.CorsPolicyName);
+
 app.UseDefaultExceptionHandler();
 app.UseFastEndpoints(c => {
 	c.Endpoints.RoutePrefix = "api";
@@ -41,4 +47,11 @@ app.UseSwaggerGen();
 
 app.Urls.Add(app.Configuration.GetRequiredSection("ListenOn").Get<string>()!);
 
-app.Run();
+{
+	using var scope = app.Services.CreateScope();
+	var context = scope.ServiceProvider.GetRequiredService<MainDbContext>();
+	await context.Database.MigrateAsync();
+	Log.Information("DB migrated success!");
+}
+Log.Information("Starting application...");
+await app.RunAsync();

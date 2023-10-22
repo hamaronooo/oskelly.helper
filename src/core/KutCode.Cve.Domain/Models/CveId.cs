@@ -5,7 +5,7 @@
 /// Where YYYY - is CVE publishing year.
 /// And XXXX - is CNA code
 /// </summary>
-public readonly struct CveId
+public readonly struct CveId : IEquatable<CveId>
 {
 	private const string CvePrefix = "cve";
 	private readonly int _year;
@@ -63,4 +63,19 @@ public readonly struct CveId
 	}
 
 	public static bool operator !=(CveId a, CveId b) => !(a == b);
+
+	public bool Equals(CveId other)
+	{
+		return _year == other._year && _cnaNumber == other._cnaNumber;
+	}
+
+	public override bool Equals(object? obj)
+	{
+		return obj is CveId other && Equals(other);
+	}
+
+	public override int GetHashCode()
+	{
+		return HashCode.Combine(_year, _cnaNumber);
+	}
 }
