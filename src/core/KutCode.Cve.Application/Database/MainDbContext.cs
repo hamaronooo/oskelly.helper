@@ -17,7 +17,7 @@ public class MainDbContext : DbContext
 	public DbSet<CveSolutionEntity> CveSolutions { get; set; }
 	public DbSet<SoftwareEntity> Software { get; set; }
 	public DbSet<PlatformEntity> Platforms { get; set; }
-	public DbSet<CveFinderQueueEntity> CveFinderQueue { get; set; }
+	public DbSet<CveResolveQueueEntity> CveFinderQueue { get; set; }
 	
 
 	protected override void OnModelCreating(ModelBuilder mb)
@@ -42,7 +42,7 @@ public class MainDbContext : DbContext
 			.HasForeignKey(x => x.PlatformId);
 		
 		//queue
-		mb.Entity<CveFinderQueueEntity>().HasKey(x => new { x.CveYear, x.CveCnaNumber, x.FinderCode });
+		mb.Entity<CveResolveQueueEntity>().HasKey(x => new { x.CveYear, x.CveCnaNumber, FinderCode = x.ResolverCode });
 	}
 
 }

@@ -4,9 +4,9 @@ namespace KutCode.Cve.Api.Hosted;
 
 public class LoaderProcessorService : IHostedService
 {
-	private readonly CveFinderProcessor _processor;
+	private readonly CveResolveProcessor _processor;
 
-	public LoaderProcessorService(CveFinderProcessor processor)
+	public LoaderProcessorService(CveResolveProcessor processor)
 	{
 		_processor = processor;
 	}

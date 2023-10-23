@@ -1,5 +1,4 @@
-﻿using KutCode.Cve.Application.MQ;
-using MassTransit;
+﻿using MassTransit;
 
 namespace KutCode.Cve.Api.Configuration;
 
@@ -11,13 +10,13 @@ public static class MassTransitConfiguration
 			builder.Configuration.Bind("Rabbit", options);
 		});
 
-		builder.Services.AddMassTransit(x => {
-			x.AddConsumer<FindCveResolveMessageConsumer>();
-			x.UsingRabbitMq((context, cfg) => {
-				cfg.Durable = true;
-				cfg.ConfigureEndpoints(context);
-			});
-		});
+		// builder.Services.AddMassTransit(x => {
+		// 	x.AddConsumer<FindCveResolveMessageConsumer>();
+		// 	x.UsingRabbitMq((context, cfg) => {
+		// 		cfg.Durable = true;
+		// 		cfg.ConfigureEndpoints(context);
+		// 	});
+		// });
 
 		return builder;
 	}

@@ -17,7 +17,7 @@ public static class DependencyInjection
 	
 	public static IServiceCollection AddCveFinderProcessor(this IServiceCollection services)
 	{
-		services.AddSingleton<CveFinderProcessor>();
+		services.AddSingleton<CveResolveProcessor>();
 		return services;
 	}
 }

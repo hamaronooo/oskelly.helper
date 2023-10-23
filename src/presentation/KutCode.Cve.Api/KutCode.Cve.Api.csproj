@@ -42,4 +42,9 @@
       <None Remove=".gitignore" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Endpoints\Cve\CRUD\" />
+      <Folder Include="Endpoints\Queue\" />
+    </ItemGroup>
+
 </Project>

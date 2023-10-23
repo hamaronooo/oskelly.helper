@@ -1,4 +1,5 @@
 ﻿using KutCode.Cve.Application.Database;
+using KutCode.Cve.Application.Interfaces.Cve;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 

@@ -21,7 +21,8 @@ public static class SwaggerConfiguration
 			};
 			
 			o.TagDescriptions = t => {
-				//t["Doc"] = "Операции с документами пользователя";
+				t["Cve"] = "Операции с CVE";
+				t["Queue"] = "Операции очередями обработчиков";
 			};
 
 			// if (securitySettings?.Static is not null && securitySettings.Static.IsEnabled && !string.IsNullOrEmpty(securitySettings.Static.HeaderName))

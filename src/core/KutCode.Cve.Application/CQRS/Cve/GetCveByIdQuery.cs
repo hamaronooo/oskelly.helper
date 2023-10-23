@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using KutCode.Cve.Application.Database;
+using KutCode.Cve.Application.Interfaces.Cve;
 using KutCode.Cve.Domain.Dto.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
