@@ -17,7 +17,10 @@ public sealed class ReportRequestEntity : ModelWithId<Guid>
 
 	[Column("search_strategy")]
 	public ReportSearchStrategy SearchStrategy { get; set; } = ReportSearchStrategy.Combine;
-
+	
+	[Column("sys_created", TypeName = "timestamp without time zone")]
+	public DateTime SysCreated { get; set; } = DateTime.Now;
+	
 	/// <summary>
 	/// Resolver Code через разделитель ';'
 	/// </summary>
