@@ -12,7 +12,7 @@ public static class LogConfiguration
 		var loggerConfig = new LoggerConfiguration()
 			.MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
 			.Enrich.FromLogContext();
-		
+
 #if DEBUG
 		loggerConfig.WriteTo.Logger(c => c.WriteTo.Console(LogEventLevel.Information));
 

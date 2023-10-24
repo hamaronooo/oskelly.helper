@@ -12,7 +12,10 @@ namespace KutCode.Cve.Application.Database.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.RenameTable(name: "cve_finder_queue", newName: "cve_resolve_queue");
-            migrationBuilder.RenameColumn("finder_code", "cve_resolve_queue", "resolver_code");
+            migrationBuilder.RenameColumn(
+                name: "finder_code",
+                table: "cve_resolve_queue",
+                newName: "resolver_code");
             migrationBuilder.AddColumn<bool>(name: "update_cve", table: "cve_resolve_queue", type: "boolean", nullable: false, defaultValue: false);
         }
 
@@ -20,7 +23,12 @@ namespace KutCode.Cve.Application.Database.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.RenameTable(name: "cve_resolve_queue", newName: "cve_finder_queue");
-            migrationBuilder.RenameColumn("resolver_code", "cve_finder_queue", "finder_code");
+        
+            migrationBuilder.RenameColumn(
+                name: "resolver_code",
+                table: "cve_resolve_queue",
+                newName: "finder_code");
+            
             migrationBuilder.DropColumn(name: "update_cve", table: "cve_resolve_queue");
         }
     }

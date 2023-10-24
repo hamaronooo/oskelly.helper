@@ -5,7 +5,7 @@ using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 
-namespace KutCode.Cve.Application.CveFinder;
+namespace KutCode.Cve.Application.CveResolve;
 
 public class CveResolveProcessor
 {

@@ -1,4 +1,4 @@
-﻿using KutCode.Cve.Application.CveFinder;
+﻿using KutCode.Cve.Application.CveResolve;
 
 namespace KutCode.Cve.Api.Hosted;
 
