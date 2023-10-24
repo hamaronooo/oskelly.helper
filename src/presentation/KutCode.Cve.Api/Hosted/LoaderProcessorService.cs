@@ -17,7 +17,7 @@ public class LoaderProcessorService : IHostedService
 			TaskCreationOptions.LongRunning, TaskScheduler.Default);
 	}
 
-	public  Task StopAsync(CancellationToken cancellationToken)
+	public Task StopAsync(CancellationToken cancellationToken)
 	{
 		return Task.CompletedTask;
 	}

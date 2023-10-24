@@ -1,5 +1,4 @@
-﻿using FastEndpoints;
-using KutCode.Cve.Application.Interfaces;
+﻿using KutCode.Cve.Application.Interfaces;
 
 namespace KutCode.Cve.Api.Endpoints.Queue.FlushQueue;
 
@@ -11,6 +10,7 @@ public class Endpoint : EndpointWithoutRequest
 	{
 		_manager = manager;
 	}
+
 	public override void Configure()
 	{
 		AllowAnonymous();

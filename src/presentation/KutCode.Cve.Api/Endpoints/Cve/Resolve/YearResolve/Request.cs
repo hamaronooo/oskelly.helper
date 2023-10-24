@@ -2,6 +2,4 @@
 
 namespace KutCode.Cve.Api.Endpoints.Cve.Resolve.YearResolve;
 
-public sealed class Request : YearCveResolveRequest
-{
-}
+public sealed class Request : YearCveResolveRequest { }

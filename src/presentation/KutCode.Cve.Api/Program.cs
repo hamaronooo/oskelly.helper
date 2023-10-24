@@ -1,5 +1,8 @@
+global using Serilog;
+global using FastEndpoints;
+global using KutCode.Cve.Services;
+global using KutCode.Cve.Application;
 using System.Text.Json.Serialization;
-using FastEndpoints;
 using FastEndpoints.Swagger;
 using KutCode.Cve.Api.Configuration;
 using KutCode.Cve.Api.Hosted;
@@ -7,7 +10,7 @@ using KutCode.Cve.Application;
 using KutCode.Cve.Application.Database;
 using KutCode.Cve.Services;
 using Microsoft.EntityFrameworkCore;
-using Serilog;
+using AssemblyInfo = KutCode.Cve.Application.AssemblyInfo;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,7 +19,7 @@ builder.AddFastEndpoints()
 	.ConfigureSwagger()
 	.ConfigureSerilogLogging();
 
-builder.Services.AddMediatR(x => x.RegisterServicesFromAssemblies(typeof(KutCode.Cve.Application.AssemblyInfo).Assembly));
+builder.Services.AddMediatR(x => x.RegisterServicesFromAssemblies(typeof(AssemblyInfo).Assembly));
 builder.Services.AddMainDbContext(builder.Configuration.GetConnectionString("Main")!);
 builder.Services.AddHostedService<WarmUpService>();
 builder.Services.AddHostedService<LoaderProcessorService>();
@@ -24,7 +27,7 @@ builder.Services.AddCveFinderProcessor();
 builder.Services.AddServices();
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
-builder.Services.AddAutoMapper(typeof(KutCode.Cve.Domain.AssemblyInfo));
+builder.Services.AddAutoMapper(typeof(KutCode.Cve.Domain.AssemblyInfo), typeof(Program));
 
 var app = builder.Build();
 app.UseSerilogRequestLogging();

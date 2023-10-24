@@ -2,6 +2,4 @@
 
 namespace KutCode.Cve.Api.Endpoints.Cve.Load.YearLoad;
 
-public sealed class Request : YearCveLoadRequest
-{
-}
+public sealed class Request : YearCveLoadRequest { }

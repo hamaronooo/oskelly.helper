@@ -1,5 +1,4 @@
-﻿using FastEndpoints;
-using KutCode.Cve.Application.CQRS.Cve;
+﻿using KutCode.Cve.Application.CQRS.Cve;
 using MediatR;
 
 namespace KutCode.Cve.Api.Endpoints.Cve.Load.YearLoad;

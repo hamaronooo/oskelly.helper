@@ -1,5 +1,4 @@
-﻿using FastEndpoints;
-using KutCode.Cve.Application.Interfaces;
+﻿using KutCode.Cve.Application.Interfaces;
 using KutCode.Cve.Domain.Dto;
 
 namespace KutCode.Cve.Api.Endpoints.Queue.GetQueueState;
@@ -12,6 +11,7 @@ public class Endpoint : EndpointWithoutRequest<CveFinderQueueState>
 	{
 		_manager = manager;
 	}
+
 	public override void Configure()
 	{
 		AllowAnonymous();
@@ -21,6 +21,6 @@ public class Endpoint : EndpointWithoutRequest<CveFinderQueueState>
 
 	public override async Task<CveFinderQueueState> ExecuteAsync(CancellationToken ct)
 	{
-		return await _manager.GetStateAsync(ct);	
+		return await _manager.GetStateAsync(ct);
 	}
 }

@@ -9,17 +9,17 @@ public static class SwaggerConfiguration
 		// var securitySettings = builder.Configuration
 		// 	.GetSection("Security")
 		// 	.Get<ApiSecuritySettings>();
-		
+
 		builder.Services.SwaggerDocument(o => {
 			o.RemoveEmptyRequestSchema = true;
 			o.MaxEndpointVersion = 2;
 			o.MinEndpointVersion = 1;
 			o.ShortSchemaNames = true;
-			o.DocumentSettings = (s) => {
+			o.DocumentSettings = s => {
 				s.Title = "API HR сервиса упрощения подбора";
 				s.Version = "v1";
 			};
-			
+
 			o.TagDescriptions = t => {
 				t["Cve"] = "Операции с CVE";
 				t["Queue"] = "Операции очередями обработчиков";
@@ -41,5 +41,4 @@ public static class SwaggerConfiguration
 
 		return builder;
 	}
-
 }

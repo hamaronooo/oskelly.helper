@@ -2,6 +2,4 @@
 
 namespace KutCode.Cve.Api.Endpoints.Cve.Resolve.ListResolve;
 
-public sealed class Request : ListCveResolveRequest
-{
-}
+public sealed class Request : ListCveResolveRequest { }

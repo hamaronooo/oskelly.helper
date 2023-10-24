@@ -1,5 +1,4 @@
-﻿using FastEndpoints;
-using KutCode.Cve.Application.Interfaces;
+﻿using KutCode.Cve.Application.Interfaces;
 
 namespace KutCode.Cve.Api.Endpoints.Cve.Resolve.YearResolve;
 

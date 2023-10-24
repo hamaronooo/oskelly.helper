@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using KutCode.Cve.Domain.Dto.Entities;
+using KutCode.Cve.Domain.Dto.Entities.Report;
 using KutCode.Cve.Domain.Entities;
+using KutCode.Cve.Domain.Entities.Report;
 
 namespace KutCode.Cve.Domain.Mappings;
 
@@ -15,5 +17,8 @@ public sealed class EntityDtoMappings : Profile
 		CreateMap<PlatformEntity, PlatformDto>();
 		CreateMap<VulnerabilityPointEntity, VulnerabilityPointDto>();
 		CreateMap<CveSolutionEntity, CveSolutionDto>();
+
+		CreateMap<ReportRequestEntity, ReportRequestDto>();
+		CreateMap<ReportRequestCveEntity, ReportRequestCveDto>();
 	}
 }

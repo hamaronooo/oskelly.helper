@@ -1,5 +1,4 @@
-﻿using Serilog;
-using Serilog.Events;
+﻿using Serilog.Events;
 
 namespace KutCode.Cve.Api.Configuration;
 
@@ -8,7 +7,7 @@ public static class LogConfiguration
 	public static WebApplicationBuilder ConfigureSerilogLogging(this WebApplicationBuilder builder)
 	{
 		builder.Host.UseSerilog();
-		
+
 		var loggerConfig = new LoggerConfiguration()
 			.MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
 			.Enrich.FromLogContext();
@@ -21,7 +20,7 @@ public static class LogConfiguration
 				rollingInterval: RollingInterval.Day,
 				restrictedToMinimumLevel: LogEventLevel.Information));
 #endif
-		
+
 		Log.Logger = loggerConfig.CreateLogger();
 		return builder;
 	}

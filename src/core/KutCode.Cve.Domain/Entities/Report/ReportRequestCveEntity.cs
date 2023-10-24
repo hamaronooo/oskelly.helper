@@ -22,9 +22,9 @@ public sealed class ReportRequestCveEntity : ModelWithId<Guid>
 	public string CveCnaNumber { get; set; }
 
 	[Column("platform")]
-	public string Platform { get; set; }
+	public string? Platform { get; set; }
 	[Column("software")]
-	public string Software { get; set; }
+	public string? Software { get; set; }
 
 	[Column("report_request_id")]
 	public Guid ReportRequestId { get; set; }

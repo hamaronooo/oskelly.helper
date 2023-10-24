@@ -1,5 +1,4 @@
-﻿using FastEndpoints;
-using KutCode.Cve.Application.CQRS.Cve;
+﻿using KutCode.Cve.Application.CQRS.Cve;
 using KutCode.Cve.Domain.Dto.Entities;
 using KutCode.Cve.Domain.Models;
 using MediatR;

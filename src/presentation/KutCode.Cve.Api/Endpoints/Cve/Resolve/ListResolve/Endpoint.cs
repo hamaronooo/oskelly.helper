@@ -1,5 +1,4 @@
-﻿using FastEndpoints;
-using KutCode.Cve.Application.Interfaces;
+﻿using KutCode.Cve.Application.Interfaces;
 using KutCode.Cve.Domain.Entities;
 using KutCode.Cve.Domain.Models;
 
@@ -24,7 +23,7 @@ public class Endpoint : Endpoint<Request>
 	public override async Task HandleAsync(Request req, CancellationToken ct)
 	{
 		ThrowIfAnyErrors();
-		List<CveResolveQueueEntity> list = req.CveList.Select(x
+		var list = req.CveList.Select(x
 			=> new CveResolveQueueEntity(CveId.Parse(x), req.ResolverCode, 10) {
 				UpdateCve = req.UpdateCve
 			}).ToList();
