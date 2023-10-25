@@ -21,6 +21,8 @@ public sealed class ReportRequestCveEntity : ModelWithId<Guid>
 	[Column("cve_cna_number")]
 	public string CveCnaNumber { get; set; }
 
+	public CveId CveId => new(CveYear, CveCnaNumber); 
+
 	[Column("platform")]
 	public string? Platform { get; set; }
 	[Column("software")]

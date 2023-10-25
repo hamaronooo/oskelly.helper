@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace KutCode.Cve.Application.CQRS.Report;
 
 /// <summary>
-/// Full report request model with CVE list
+/// Light report request model withOut CVE list
 /// </summary>
 public sealed record ReportByIdQuery(Guid Id) : IRequest<Optional<ReportRequestDto>>;
 public sealed class ReportByIdQueryHandler : IRequestHandler<ReportByIdQuery, Optional<ReportRequestDto>>
