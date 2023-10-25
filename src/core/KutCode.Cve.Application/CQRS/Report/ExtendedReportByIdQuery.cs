@@ -8,23 +8,24 @@ namespace KutCode.Cve.Application.CQRS.Report;
 /// <summary>
 /// Full report request model with CVE list
 /// </summary>
-public sealed record ReportByIdQuery(Guid Id) : IRequest<Optional<ReportRequestDto>>;
-public sealed class ReportByIdQueryHandler : IRequestHandler<ReportByIdQuery, Optional<ReportRequestDto>>
+public sealed record ExtendedReportByIdQuery(Guid Id) : IRequest<Optional<ReportRequestExtendedDto>>;
+public sealed class ExtendedReportByIdQueryHandler : IRequestHandler<ExtendedReportByIdQuery, Optional<ReportRequestExtendedDto>>
 {
 	private readonly MainDbContext _context;
 	private readonly IMapper _mapper;
-	public ReportByIdQueryHandler(MainDbContext context, IMapper mapper)
+	public ExtendedReportByIdQueryHandler(MainDbContext context, IMapper mapper)
 	{
 		_context = context;
 		_mapper = mapper;
 	}
 
-	public async Task<Optional<ReportRequestDto>> Handle(ReportByIdQuery request, CancellationToken ct)
+	public async Task<Optional<ReportRequestExtendedDto>> Handle(ExtendedReportByIdQuery request, CancellationToken ct)
 	{
 		var response = await _context.Set<ReportRequestEntity>()
 			.AsNoTracking()
+			.Include(x => x.Cve)
 			.FirstOrDefaultAsync(x => x.Id == request.Id, ct);
 
-		return _mapper.Map<ReportRequestDto>(response);
+		return _mapper.Map<ReportRequestExtendedDto>(response);
 	}
 }

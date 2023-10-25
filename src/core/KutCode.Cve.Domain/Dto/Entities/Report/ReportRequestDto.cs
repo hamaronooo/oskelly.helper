@@ -3,7 +3,7 @@ using KutCode.Cve.Domain.Enums;
 
 namespace KutCode.Cve.Domain.Dto.Entities.Report;
 
-public sealed class ReportRequestDto
+public class ReportRequestDto
 {
 	public Guid Id { get; init; }
 	public string? CustomName { get;init; }
@@ -18,6 +18,4 @@ public sealed class ReportRequestDto
 	/// </summary>
 	public string SourcesRaw { get;init; }
 	public string[] Sources => SourcesRaw.Split(';');
-
-	public List<ReportRequestCveDto> Cve { get; init; } = new();
 }

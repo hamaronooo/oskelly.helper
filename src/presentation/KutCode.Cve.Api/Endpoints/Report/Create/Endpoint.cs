@@ -43,7 +43,7 @@ public sealed class Endpoint : Endpoint<Request,ReportRequestDto>
 			// ".csv" =>  _requestParser.ParseCsvReportRequestCve(fileStream),
 			_ => Enumerable.Empty<ReportRequestCveDto>().ToList()
 		};
-		ReportRequestDto command = new ReportRequestDto() {
+		var command = new ReportRequestExtendedDto() {
 			CustomName = req.CustomName,
 			SearchStrategy = req.SearchStrategy,
 			SourcesRaw = req.SourcesRaw,
