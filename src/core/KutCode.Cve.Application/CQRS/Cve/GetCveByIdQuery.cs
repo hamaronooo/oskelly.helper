@@ -1,14 +1,13 @@
-﻿using AutoMapper;
-using KutCode.Cve.Application.Database;
+﻿using KutCode.Cve.Application.Database;
 using KutCode.Cve.Application.Interfaces.Cve;
 using KutCode.Cve.Domain.Dto.Entities;
-using MediatR;
+using KutCode.Optionality;
 using Microsoft.EntityFrameworkCore;
 
 namespace KutCode.Cve.Application.CQRS.Cve;
 
-public sealed record GetCveByIdQuery(CveId CveId) : IRequest<CveDto?>;
-public class GetCveByIdQueryHandler : IRequestHandler<GetCveByIdQuery, CveDto?>
+public sealed record GetCveByIdQuery(CveId CveId) : IRequest<Optional<CveDto>>;
+public class GetCveByIdQueryHandler : IRequestHandler<GetCveByIdQuery, Optional<CveDto>>
 {
 	private readonly ICveCache _cveCache;
 	private readonly MainDbContext _context;
@@ -21,7 +20,7 @@ public class GetCveByIdQueryHandler : IRequestHandler<GetCveByIdQuery, CveDto?>
 		_mapper = mapper;
 	}
 
-	public async Task<CveDto?> Handle(GetCveByIdQuery request, CancellationToken cancellationToken)
+	public async Task<Optional<CveDto>> Handle(GetCveByIdQuery request, CancellationToken cancellationToken)
 	{
 		if (_cveCache.IsExist(request.CveId) is false) return null;
 		var entity =  await _context.Cve.AsNoTracking()

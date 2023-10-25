@@ -31,6 +31,18 @@ public readonly struct CveId : IEquatable<CveId>
 		if (firstPart != CvePrefix && parts.Length > 2) throw new ArgumentException("Wrong CVE id string");
 		return new CveId(int.Parse(parts[0]), parts[1]);
 	}
+
+	public static bool TryParse(string cveIdAsString, out CveId? value)
+	{
+		try {
+			value = Parse(cveIdAsString);
+			return true;
+		}
+		catch {
+			value = null;
+			return false;
+		}
+	}
 	
 	public CveId(int year, string cnaNumber)
 	{

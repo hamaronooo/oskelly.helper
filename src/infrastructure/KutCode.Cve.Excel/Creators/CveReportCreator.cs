@@ -1,7 +1,7 @@
 ﻿using OfficeOpenXml;
 using OfficeOpenXml.Table;
 
-namespace KutCode.Cve.ReportCreator.Creators;
+namespace KutCode.Cve.Excel.Creators;
 
 public class CveReportCreator
 {

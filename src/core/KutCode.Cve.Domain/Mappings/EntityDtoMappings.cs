@@ -18,7 +18,7 @@ public sealed class EntityDtoMappings : Profile
 		CreateMap<VulnerabilityPointEntity, VulnerabilityPointDto>();
 		CreateMap<CveSolutionEntity, CveSolutionDto>();
 
-		CreateMap<ReportRequestEntity, ReportRequestDto>();
-		CreateMap<ReportRequestCveEntity, ReportRequestCveDto>();
+		CreateMap<ReportRequestEntity, ReportRequestDto>().ReverseMap();
+		CreateMap<ReportRequestCveEntity, ReportRequestCveDto>().ReverseMap();
 	}
 }

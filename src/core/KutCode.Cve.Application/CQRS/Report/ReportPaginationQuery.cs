@@ -1,8 +1,5 @@
-﻿
-using AutoMapper;
-using KutCode.Cve.Application.Database;
+﻿using KutCode.Cve.Application.Database;
 using KutCode.Cve.Domain.Dto.Entities.Report;
-using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace KutCode.Cve.Application.CQRS.Report;

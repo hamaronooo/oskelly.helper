@@ -9,6 +9,7 @@ public sealed record ReportRequestCveDto
 	
 	public string? Platform { get; init; }
 	public string? Software { get; init; }
+	public string? CveDescription { get; init; }
 	
 	public Guid ReportRequestId { get; init; }
 }
