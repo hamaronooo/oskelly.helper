@@ -29,18 +29,19 @@ namespace KutCode.Cve.Application.Database.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "cve_finder_queue",
+                name: "cve_resolve_queue",
                 columns: table => new
                 {
                     cve_year = table.Column<int>(type: "integer", nullable: false),
                     cve_cna_number = table.Column<string>(type: "text", nullable: false),
-                    finder_code = table.Column<string>(type: "text", nullable: false),
+                    resolver_code = table.Column<string>(type: "text", nullable: false),
+                    update_cve = table.Column<bool>(type: "boolean", nullable: false),
                     priority = table.Column<int>(type: "integer", nullable: false),
                     sys_created = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_cve_finder_queue", x => new { x.cve_year, x.cve_cna_number, x.finder_code });
+                    table.PrimaryKey("PK_cve_resolve_queue", x => new { x.cve_year, x.cve_cna_number, x.resolver_code });
                 });
 
             migrationBuilder.CreateTable(
@@ -57,6 +58,22 @@ namespace KutCode.Cve.Application.Database.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "report_request",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    custom_name = table.Column<string>(type: "text", nullable: true),
+                    state = table.Column<int>(type: "integer", nullable: false),
+                    search_strategy = table.Column<int>(type: "integer", nullable: false),
+                    sys_created = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    sources = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_report_request", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "software",
                 columns: table => new
                 {
@@ -66,6 +83,28 @@ namespace KutCode.Cve.Application.Database.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_software", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "report_request_cve",
+                columns: table => new
+                {
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    cve_year = table.Column<int>(type: "integer", nullable: false),
+                    cve_cna_number = table.Column<string>(type: "text", nullable: false),
+                    platform = table.Column<string>(type: "text", nullable: true),
+                    software = table.Column<string>(type: "text", nullable: true),
+                    report_request_id = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_report_request_cve", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_report_request_cve_report_request_report_request_id",
+                        column: x => x.report_request_id,
+                        principalTable: "report_request",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -132,6 +171,11 @@ namespace KutCode.Cve.Application.Database.Migrations
                 column: "vulnerability_point_id");
 
             migrationBuilder.CreateIndex(
+                name: "IX_report_request_cve_report_request_id",
+                table: "report_request_cve",
+                column: "report_request_id");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_vulnerability_point_cve_year_cve_cna_number",
                 table: "vulnerability_point",
                 columns: new[] { "cve_year", "cve_cna_number" });
@@ -156,13 +200,19 @@ namespace KutCode.Cve.Application.Database.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "cve_finder_queue");
+                name: "cve_resolve_queue");
 
             migrationBuilder.DropTable(
                 name: "cve_solution");
 
             migrationBuilder.DropTable(
+                name: "report_request_cve");
+
+            migrationBuilder.DropTable(
                 name: "vulnerability_point");
+
+            migrationBuilder.DropTable(
+                name: "report_request");
 
             migrationBuilder.DropTable(
                 name: "cve");

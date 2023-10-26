@@ -1,14 +1,12 @@
 ﻿using KutCode.Cve.Application.Database;
 using KutCode.Cve.Application.Interfaces.Cve;
-using KutCode.Cve.Domain.Models.CveResolver;
-using MediatR;
+using KutCode.Cve.Domain.Models.CveVulnerabilityLoader;
 using Serilog;
 
 namespace KutCode.Cve.Application.CQRS.Cve;
 
-public sealed record ResolveCveCommand(SingleCveResolveRequest ResolveRequest) : IRequest;
-
-public class FindCveResolveCommandHandler : IRequestHandler<ResolveCveCommand>
+public sealed record ResolveCveCommand(SingleCveVulnerabilityLoadRequest VulnerabilityLoadRequest) : IRequest;
+public class ResolveCveCommandHandler : IRequestHandler<ResolveCveCommand>
 {
 	private readonly ICveResolverManager _finderManager;
 	private readonly ICveCache _cveCache;
@@ -16,12 +14,12 @@ public class FindCveResolveCommandHandler : IRequestHandler<ResolveCveCommand>
 	private readonly IEntityCacheService<PlatformEntity, Guid> _platformCache;
 	private readonly MainDbContext _context;
 
-	public FindCveResolveCommandHandler(
+	public ResolveCveCommandHandler(
 		ICveResolverManager finderManager, 
 		IEntityCacheService<SoftwareEntity, Guid> softwareCache,
 		IEntityCacheService<PlatformEntity, Guid> platformCache, 
 		MainDbContext context,
-        ICveCache cveCache)
+		ICveCache cveCache)
 	{
 		_finderManager = finderManager;
 		_softwareCache = softwareCache;
@@ -32,16 +30,16 @@ public class FindCveResolveCommandHandler : IRequestHandler<ResolveCveCommand>
 
 	public async Task Handle(ResolveCveCommand request, CancellationToken ct)
 	{
-		var resolver = _finderManager.GetResolver(request.ResolveRequest.ResolverCode);
-		if (resolver is null) {
-			Log.Error("{ClassName}; Resolver with code {RCode} is not found", GetType().Name, request.ResolveRequest.ResolverCode);
+		var resolver = _finderManager.GetResolver(request.VulnerabilityLoadRequest.ResolverCode);
+		if (resolver.HasValue is false) {
+			Log.Error("{ClassName}; Resolver with code {RCode} is not found", GetType().Name, request.VulnerabilityLoadRequest.ResolverCode);
 			return;
 		}
 
-		if (_cveCache.IsExist(request.ResolveRequest.CveId) is false) return;
+		if (_cveCache.IsExist(request.VulnerabilityLoadRequest.CveId) is false) return;
 		
 		int addCounter = 0;
-		var finderResult = await resolver.FindAsync(request.ResolveRequest.CveId, ct);
+		var finderResult = await resolver.Value!.ResolveAsync(request.VulnerabilityLoadRequest.CveId, ct);
 		foreach (var found in finderResult)
 		{
 			if (found.Platform is not null)
@@ -61,6 +59,6 @@ public class FindCveResolveCommandHandler : IRequestHandler<ResolveCveCommand>
 		
 		await _context.SaveChangesAsync(ct);
 		Log.Information("Saved {Count} vul-points for CVE {Cve}; with finder code: {FCode}",
-			addCounter, request.ResolveRequest.CveId, request.ResolveRequest.ResolverCode);
+			addCounter, request.VulnerabilityLoadRequest.CveId, request.VulnerabilityLoadRequest.ResolverCode);
 	}
 }

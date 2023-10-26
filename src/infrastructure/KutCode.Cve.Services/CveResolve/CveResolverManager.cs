@@ -1,4 +1,5 @@
 ﻿using KutCode.Cve.Application.Interfaces.Cve;
+using KutCode.Optionality;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace KutCode.Cve.Services.CveResolve;
@@ -11,9 +12,9 @@ public sealed class CveResolverManager : ICveResolverManager
 		_scope = scopeFactory.CreateScope();
 	}
 
-	public ICveResolver? GetResolver(string resolverCode) => resolverCode switch
+	public Optional<ICveResolver> GetResolver(string resolverCode) => resolverCode switch
 	{
 		"msrc" => _scope.ServiceProvider.GetRequiredService<MicrosoftCveResolver>(),
-		_ => null
+		_ => Optional<ICveResolver>.None
 	};
 }

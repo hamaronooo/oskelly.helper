@@ -2,7 +2,7 @@
 using KutCode.Cve.Domain.Entities;
 using KutCode.Cve.Domain.Models;
 
-namespace KutCode.Cve.Api.Endpoints.Cve.Resolve.ListResolve;
+namespace KutCode.Cve.Api.Endpoints.Cve.CveResolve.ListResolve;
 
 public class Endpoint : Endpoint<Request>
 {

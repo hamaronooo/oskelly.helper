@@ -15,8 +15,8 @@ public sealed class MicrosoftCveResolver : ICveResolver
 	}
 
 	public string Code => "msrc";
-	
-	public async Task<IEnumerable<VulnerabilityPointEntity>> FindAsync(CveId cveId, CancellationToken ct = default)
+	public Uri Uri => new Uri("https://api.msrc.microsoft.com/");
+	public async Task<IEnumerable<VulnerabilityPointEntity>> ResolveAsync(CveId cveId, CancellationToken ct = default)
 	{
 		var msResponse = await _msrcApi.GetCveDataAsync(cveId, ct);
 		if (msResponse.IsSuccessful is false)

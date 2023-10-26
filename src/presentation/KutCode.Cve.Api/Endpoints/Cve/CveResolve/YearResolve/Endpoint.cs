@@ -1,6 +1,6 @@
 ﻿using KutCode.Cve.Application.Interfaces;
 
-namespace KutCode.Cve.Api.Endpoints.Cve.Resolve.YearResolve;
+namespace KutCode.Cve.Api.Endpoints.Cve.CveResolve.YearResolve;
 
 public class Endpoint : Endpoint<Request>
 {

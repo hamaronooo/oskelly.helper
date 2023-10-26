@@ -4,6 +4,9 @@ using MediatR;
 
 namespace KutCode.Cve.Application.CQRS.Cve;
 
+/// <summary>
+/// Обновить рейтинг угрозы CVE
+/// </summary>
 public sealed record UpdateCveCvssCommand(CveId CveId, double Cvss) : IRequest;
 public sealed class UpdateCveCvssCommandHandler : IRequestHandler<UpdateCveCvssCommand>
 {

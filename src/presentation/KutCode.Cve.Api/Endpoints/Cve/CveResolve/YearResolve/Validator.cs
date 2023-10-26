@@ -1,8 +1,8 @@
 ﻿using FluentValidation;
 
-namespace KutCode.Cve.Api.Endpoints.Cve.Load.YearLoad;
+namespace KutCode.Cve.Api.Endpoints.Cve.CveResolve.YearResolve;
 
-public class Validator : Validator<Request>
+public sealed class Validator : Validator<Request>
 {
 	public Validator()
 	{

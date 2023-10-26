@@ -17,13 +17,14 @@ var builder = WebApplication.CreateBuilder(args);
 builder.AddFastEndpoints()
 	.ConfigureCors()
 	.ConfigureSwagger()
+	.AddMassTransitConfiguration()
 	.ConfigureSerilogLogging();
 
 builder.Services.AddMediatR(x => x.RegisterServicesFromAssemblies(typeof(KutCode.Cve.Application.AssemblyInfo).Assembly));
 builder.Services.AddMainDbContext(builder.Configuration.GetConnectionString("Main")!);
 builder.Services.AddHostedService<WarmUpService>();
-builder.Services.AddHostedService<LoaderProcessorService>();
-builder.Services.AddCveFinderProcessor();
+builder.Services.AddHostedService<CveLoaderProcessorService>();
+builder.Services.AddCveResolverProcessor();
 builder.Services.AddServices();
 builder.Services.AddFileService(builder.Environment.WebRootPath);
 builder.Services.AddExcelServices();

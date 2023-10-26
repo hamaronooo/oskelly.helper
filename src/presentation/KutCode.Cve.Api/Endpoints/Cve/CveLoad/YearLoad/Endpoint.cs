@@ -1,7 +1,6 @@
 ﻿using KutCode.Cve.Application.CQRS.Cve;
-using MediatR;
 
-namespace KutCode.Cve.Api.Endpoints.Cve.Load.YearLoad;
+namespace KutCode.Cve.Api.Endpoints.Cve.CveLoad.YearLoad;
 
 public class Endpoint : Endpoint<Request>
 {

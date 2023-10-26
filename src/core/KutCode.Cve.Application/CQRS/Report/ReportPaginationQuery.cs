@@ -5,7 +5,6 @@ using Microsoft.EntityFrameworkCore;
 namespace KutCode.Cve.Application.CQRS.Report;
 
 public sealed record ReportPaginationQuery(PaginationRequest Request) : IRequest<PaginationResponse<ReportRequestDto>>;
-
 public sealed class ReportPaginationQueryHandler : IRequestHandler<ReportPaginationQuery, PaginationResponse<ReportRequestDto>>
 {
 	private readonly MainDbContext _context;

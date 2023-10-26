@@ -7,5 +7,6 @@
 public interface ICveResolver
 {
 	public string Code { get; }
-	Task<IEnumerable<VulnerabilityPointEntity>> FindAsync(CveId cveId, CancellationToken ct = default);
+	public Uri Uri { get; } // make compare by .Host
+	Task<IEnumerable<VulnerabilityPointEntity>> ResolveAsync(CveId cveId, CancellationToken ct = default);
 }

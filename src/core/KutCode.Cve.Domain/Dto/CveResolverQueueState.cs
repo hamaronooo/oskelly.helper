@@ -1,6 +1,6 @@
 ﻿namespace KutCode.Cve.Domain.Dto;
 
-public sealed class CveFinderQueueState
+public sealed class CveResolverQueueState
 {
 	/// <summary>
 	/// Cve year -- items count
