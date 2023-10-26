@@ -1,4 +1,5 @@
 ﻿using KutCode.Cve.Application.Database;
+using KutCode.Cve.Application.Interfaces.Cve;
 using KutCode.Cve.Domain.Dto;
 using KutCode.Cve.Domain.Models.CveVulnerabilityLoader;
 using Microsoft.EntityFrameworkCore;

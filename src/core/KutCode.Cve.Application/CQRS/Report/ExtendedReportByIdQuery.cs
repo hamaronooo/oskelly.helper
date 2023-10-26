@@ -23,7 +23,7 @@ public sealed class ExtendedReportByIdQueryHandler : IRequestHandler<ExtendedRep
 	{
 		var response = await _context.Set<ReportRequestEntity>()
 			.AsNoTracking()
-			.Include(x => x.Cve)
+			.Include(x => x.Vulnerabilities)
 			.FirstOrDefaultAsync(x => x.Id == request.Id, ct);
 
 		return _mapper.Map<ReportRequestExtendedDto>(response);

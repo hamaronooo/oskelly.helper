@@ -69,7 +69,7 @@ public sealed class HandleReportRequestCommandHandler: IRequestHandler<HandleRep
 						bag.Add(result);
 				}
 				catch (Exception e) {
-					Log.Error(e, "Resolver Error; Resolver code: {Code}; CveId: {Cve}", resolver.Code, dto.CveId);
+					Log.Error(e, "Resolver Error; Resolver code: {Code}; CveString: {Cve}", resolver.Code, dto.CveString);
 					// swallow
 				}
 			}

@@ -1,6 +1,6 @@
 ﻿using KutCode.Cve.Domain.Models.CveVulnerabilityLoader;
 
-namespace KutCode.Cve.Application.Interfaces;
+namespace KutCode.Cve.Application.Interfaces.Cve;
 
 /// <summary>
 /// Manage Queue of cve loading

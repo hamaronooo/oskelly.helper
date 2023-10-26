@@ -86,7 +86,7 @@ namespace KutCode.Cve.Application.Database.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "report_request_cve",
+                name: "report_request_vulnerability_point",
                 columns: table => new
                 {
                     id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -98,9 +98,9 @@ namespace KutCode.Cve.Application.Database.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_report_request_cve", x => x.id);
+                    table.PrimaryKey("PK_report_request_vulnerability_point", x => x.id);
                     table.ForeignKey(
-                        name: "FK_report_request_cve_report_request_report_request_id",
+                        name: "FK_report_request_vulnerability_point_report_request_report_re~",
                         column: x => x.report_request_id,
                         principalTable: "report_request",
                         principalColumn: "id",
@@ -171,8 +171,8 @@ namespace KutCode.Cve.Application.Database.Migrations
                 column: "vulnerability_point_id");
 
             migrationBuilder.CreateIndex(
-                name: "IX_report_request_cve_report_request_id",
-                table: "report_request_cve",
+                name: "IX_report_request_vulnerability_point_report_request_id",
+                table: "report_request_vulnerability_point",
                 column: "report_request_id");
 
             migrationBuilder.CreateIndex(
@@ -206,7 +206,7 @@ namespace KutCode.Cve.Application.Database.Migrations
                 name: "cve_solution");
 
             migrationBuilder.DropTable(
-                name: "report_request_cve");
+                name: "report_request_vulnerability_point");
 
             migrationBuilder.DropTable(
                 name: "vulnerability_point");

@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using KutCode.Cve.Application.CQRS.Cve;
+using KutCode.Cve.Application.Interfaces.Cve;
 using KutCode.Cve.Domain.Models.CveVulnerabilityLoader;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
@@ -54,7 +55,7 @@ public class CveResolveProcessor
 				}), ct);
 			}
 			catch (Exception e) {
-				Log.Error(e, "Error in cve finder work, cve: {CveId}; resolver: {ResolverCode}", nextItem.CveId, nextItem.ResolverCode);
+				Log.Error(e, "Error in cve finder work, cve: {CveString}; resolver: {ResolverCode}", nextItem.CveId, nextItem.ResolverCode);
 			}
 		}
 		

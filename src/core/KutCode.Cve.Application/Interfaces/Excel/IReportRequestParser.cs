@@ -4,6 +4,6 @@ namespace KutCode.Cve.Application.Interfaces.Excel;
 
 public interface IReportRequestParser
 {
-	List<ReportRequestCveDto> ParseXlsxReportRequestCve(Stream fileStream);
-	//List<ReportRequestCveDto> ParseCsvReportRequestCve(Stream fileStream);
+	List<ReportRequestVulnerabilityPointDto> ParseXlsxReportRequestCve(Stream fileStream);
+	//List<ReportRequestVulnerabilityPointDto> ParseCsvReportRequestCve(Stream fileStream);
 }

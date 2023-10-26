@@ -20,6 +20,6 @@ public sealed class EntityDtoMappings : Profile
 
 		CreateMap<ReportRequestEntity, ReportRequestDto>().ReverseMap();
 		CreateMap<ReportRequestEntity, ReportRequestExtendedDto>().ReverseMap();
-		CreateMap<ReportRequestCveEntity, ReportRequestCveDto>().ReverseMap();
+		CreateMap<ReportRequestVulnerabilityPointEntity, ReportRequestVulnerabilityPointDto>().ReverseMap();
 	}
 }

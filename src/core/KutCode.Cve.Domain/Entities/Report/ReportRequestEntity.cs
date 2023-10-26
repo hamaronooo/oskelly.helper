@@ -30,5 +30,5 @@ public sealed class ReportRequestEntity : ModelWithId<Guid>
 	public string[] Sources => SourcesRaw.Split(';');
 	public void SetSources(IEnumerable<string> sources) => SourcesRaw = string.Join(';', sources.Select(x => x.Trim().ToLower()).Distinct());
 
-	public ICollection<ReportRequestCveEntity> Cve { get; set; } = new List<ReportRequestCveEntity>();
+	public ICollection<ReportRequestVulnerabilityPointEntity> Vulnerabilities { get; set; } = new List<ReportRequestVulnerabilityPointEntity>();
 }

@@ -38,10 +38,10 @@ public sealed class Endpoint : Endpoint<Request,ReportRequestDto>
 		if (Files.Count > 1) ThrowError("Можно прикрепить только один файл", 400);
 
 		using var fileStream = req.File.OpenReadStream();
-		List<ReportRequestCveDto> cveList = new FileInfo(req.File.FileName).Extension.ToLower() switch {
+		List<ReportRequestVulnerabilityPointDto> cveList = new FileInfo(req.File.FileName).Extension.ToLower() switch {
 			".xlsx" => _requestParser.ParseXlsxReportRequestCve(fileStream),
 			// ".csv" =>  _requestParser.ParseCsvReportRequestCve(fileStream),
-			_ => Enumerable.Empty<ReportRequestCveDto>().ToList()
+			_ => Enumerable.Empty<ReportRequestVulnerabilityPointDto>().ToList()
 		};
 		var command = new ReportRequestExtendedDto() {
 			CustomName = req.CustomName,

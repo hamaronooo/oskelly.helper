@@ -1,4 +1,5 @@
 ﻿using KutCode.Cve.Application.Interfaces;
+using KutCode.Cve.Application.Interfaces.Cve;
 
 namespace KutCode.Cve.Api.Endpoints.Cve.CveResolve.YearResolve;
 

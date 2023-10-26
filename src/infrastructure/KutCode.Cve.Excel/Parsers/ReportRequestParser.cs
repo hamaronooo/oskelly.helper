@@ -8,15 +8,15 @@ namespace KutCode.Cve.Excel.Parsers;
 
 public sealed class ReportRequestParser : IReportRequestParser
 {
-	public List<ReportRequestCveDto> ParseXlsxReportRequestCve(Stream fileStream)
+	public List<ReportRequestVulnerabilityPointDto> ParseXlsxReportRequestCve(Stream fileStream)
 	{
 		using ExcelPackage package = new (fileStream);
-		var result = new List<ReportRequestCveDto>();
+		var result = new List<ReportRequestVulnerabilityPointDto>();
 		var sheet = package.Workbook.Worksheets[0];
 		if (sheet is null) return result;
 		for (int i = 1; i <= sheet.Dimension.Rows; i++) {
 			if (CveId.TryParse(sheet.Cells[i,1].Text.Replace(" ", ""), out var cveId) is false) continue;
-			result.Add(new ReportRequestCveDto {
+			result.Add(new ReportRequestVulnerabilityPointDto {
 				CveYear = cveId.Value.Year,
 				CveCnaNumber = cveId.Value.CnaNumber,
 				Software = sheet.Cells[i,2].Text.Trim(),
@@ -27,7 +27,7 @@ public sealed class ReportRequestParser : IReportRequestParser
 		return result;
 	}
 
-	// public List<ReportRequestCveDto> ParseCsvReportRequestCve(Stream fileStream)
+	// public List<ReportRequestVulnerabilityPointDto> ParseCsvReportRequestCve(Stream fileStream)
 	// {
 	// 	using var textFieldParser = new TextFieldParser(fileStream);
 	// 	textFieldParser.TextFieldType = FieldType.Delimited;
@@ -36,7 +36,7 @@ public sealed class ReportRequestParser : IReportRequestParser
 	// 	{
 	// 		string[]? rows = textFieldParser.ReadFields();
 	// 	}
-	// 	var result = new List<ReportRequestCveDto>();
+	// 	var result = new List<ReportRequestVulnerabilityPointDto>();
 	// 	return result;
 	// }
 }

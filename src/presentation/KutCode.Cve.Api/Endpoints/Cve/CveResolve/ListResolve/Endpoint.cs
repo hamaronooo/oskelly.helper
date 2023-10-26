@@ -1,4 +1,5 @@
 ﻿using KutCode.Cve.Application.Interfaces;
+using KutCode.Cve.Application.Interfaces.Cve;
 using KutCode.Cve.Domain.Entities;
 using KutCode.Cve.Domain.Models;
 

@@ -21,7 +21,7 @@ public class MainDbContext : DbContext
 	public DbSet<CveResolveQueueEntity> CveResolveQueue { get; set; }
 
 	public DbSet<ReportRequestEntity> ReportRequests { get; set; }
-	public DbSet<ReportRequestCveEntity> ReportRequestCve { get; set; }
+	public DbSet<ReportRequestVulnerabilityPointEntity> ReportRequestCve { get; set; }
 
 	protected override void OnModelCreating(ModelBuilder mb)
 	{
@@ -48,7 +48,7 @@ public class MainDbContext : DbContext
 		mb.Entity<CveResolveQueueEntity>().HasKey(x => new { x.CveYear, x.CveCnaNumber, x.ResolverCode });
 
 		// report
-		mb.Entity<ReportRequestEntity>().HasMany(x => x.Cve)
+		mb.Entity<ReportRequestEntity>().HasMany(x => x.Vulnerabilities)
 			.WithOne(x => x.ReportRequest)
 			.HasForeignKey(x => x.ReportRequestId);
 	}

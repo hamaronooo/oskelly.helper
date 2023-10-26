@@ -2,6 +2,7 @@
 using KutCode.Cve.Services.ApiRepositories.Microsoft;
 using KutCode.Cve.Services.CveLoad;
 using KutCode.Cve.Services.CveResolve;
+using KutCode.Cve.Services.CveSolution;
 using KutCode.Cve.Services.EntityCache;
 using KutCode.Cve.Services.File;
 using Microsoft.Extensions.DependencyInjection;
@@ -24,6 +25,7 @@ public static class DependencyInjection
 		services.AddSingleton<ICveLoaderManager, CveLoaderManager>();
 		services.AddScoped<MicrosoftCveResolver>();
 		services.AddScoped<MitreCveLoader>();
+		services.AddScoped<ICveSolutionFinder, CveSolutionFinder>();
 		
 		services.AddSingleton<ICveCache, CveCacheService>();
 		services.AddSingleton<IEntityCacheService<SoftwareEntity, Guid>, SoftwareCacheService>();
