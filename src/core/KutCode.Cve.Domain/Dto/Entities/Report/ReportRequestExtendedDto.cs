@@ -2,5 +2,5 @@
 
 public class ReportRequestExtendedDto : ReportRequestDto
 {
-	public List<ReportRequestVulnerabilityPointDto> Cve { get; init; } = new();
+	public List<ReportRequestVulnerabilityPointDto> VulnerabilityPoints { get; init; } = new();
 }

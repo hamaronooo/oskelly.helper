@@ -47,7 +47,7 @@ public sealed class Endpoint : Endpoint<Request,ReportRequestDto>
 			CustomName = req.CustomName,
 			SearchStrategy = req.SearchStrategy,
 			SourcesRaw = req.SourcesRaw,
-			Cve = cveList
+			VulnerabilityPoints = cveList
 		};
 		var response = await _mediator.Send(new CreateReportCommand(command), ct);
 		await SendOkAsync(response, ct);

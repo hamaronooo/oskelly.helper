@@ -2,6 +2,9 @@
 using KutCode.Cve.Domain.Dto.Entities.Report;
 using KutCode.Cve.Domain.Models.Solution;
 using Lifti;
+using Lifti.Querying;
+using Lifti.Querying.QueryParts;
+using Lifti.Tokenization;
 
 namespace KutCode.Cve.Services.CveSolution;
 
@@ -27,15 +30,15 @@ public sealed class CveSolutionFinder : ICveSolutionFinder
 		if (string.IsNullOrEmpty(vulnerabilityPoint.Software) is false)
 		{
 			FullTextIndex<Guid> index = await GetSoftwareIndex(resolvesList, ct);
-			// todo: build and use query for search // always convert to string
-			ISearchResults<Guid> a = index.Search("");
+			Query query = GetQuery(vulnerabilityPoint.Software, index.DefaultTokenizer);
+			ISearchResults<Guid> a = index.Search(query.ToString()!);
 			results.AddRange(a.Select(x => (x.Key, x.Score)));
 		}
 		if (string.IsNullOrEmpty(vulnerabilityPoint.Platform) is false)
 		{
 			FullTextIndex<Guid> index = await GetPlatformIndex(resolvesList, ct);
-			// todo: build and use query for search // always convert to string
-			ISearchResults<Guid> a = index.Search("");
+			Query query = GetQuery(vulnerabilityPoint.Platform, index.DefaultTokenizer);
+			ISearchResults<Guid> a = index.Search(query.ToString()!);
 			results.AddRange(a.Select(x => (x.Key, x.Score)));
 		}
 
@@ -46,8 +49,33 @@ public sealed class CveSolutionFinder : ICveSolutionFinder
 					new SolutionFinderResultItem<VulnerabilityPointEntity>(entity, searchResult.Total));
 		return new(result);
 	}
-	
-	
+
+	private Query GetQuery(string prompt, IIndexTokenizer tokenizer)
+	{
+		var promptParts = prompt.Split(' ', '_');
+		Query query;
+		if (promptParts.Length == 1) {
+			// ввести дистанцию и edits зависимыми от длины строки
+			ushort distance = (ushort)(prompt.Length <= 15 ? 2 : 3);
+			ushort edits = (ushort)(prompt.Length <= 15 ? 2 : 4);
+			query = new Query(new FuzzyMatchQueryPart(tokenizer.Normalize(prompt), distance, edits));
+		}
+		else if (promptParts.Length == 2)
+			query = new Query(
+				new AndQueryOperator(new FuzzyMatchQueryPart(tokenizer.Normalize(promptParts[0]), 2), 
+					new FuzzyMatchQueryPart(tokenizer.Normalize(promptParts[1]), 4, 2)));
+		else {
+			var firstPart = new AndQueryOperator(new FuzzyMatchQueryPart(tokenizer.Normalize(promptParts[0]), 2),
+				new FuzzyMatchQueryPart(tokenizer.Normalize(promptParts[1]), 4, 2));
+			var secondPart = new FuzzyMatchQueryPart(string.Join(' ', promptParts[2..].Select(x => tokenizer.Normalize(x))), 6, 3);
+			query = new Query(
+				new AndQueryOperator(firstPart, secondPart));
+		}
+		// todo: если первый поиск не дал результатов - повторить с более гибкой query 
+		// todo: если part содержит более 1 точки, не применять минимальный Fuzzy 
+		return query;
+	}
+
 	async Task<FullTextIndex<Guid>> GetPlatformIndex(IEnumerable<VulnerabilityPointEntity> foundedResolves, CancellationToken ct)
 	{
 		FullTextIndex<Guid> index = new FullTextIndexBuilder<Guid>().Build();
