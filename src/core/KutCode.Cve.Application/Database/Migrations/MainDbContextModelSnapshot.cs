@@ -313,11 +313,11 @@ namespace KutCode.Cve.Application.Database.Migrations
             modelBuilder.Entity("KutCode.Cve.Domain.Entities.VulnerabilityPointEntity", b =>
                 {
                     b.HasOne("KutCode.Cve.Domain.Entities.PlatformEntity", "Platform")
-                        .WithMany("VulnerabilityPoints")
+                        .WithMany("Vulnerabilities")
                         .HasForeignKey("PlatformId");
 
                     b.HasOne("KutCode.Cve.Domain.Entities.SoftwareEntity", "Software")
-                        .WithMany("VulnerabilityPoints")
+                        .WithMany("Vulnerabilities")
                         .HasForeignKey("SoftwareId");
 
                     b.HasOne("KutCode.Cve.Domain.Entities.CveEntity", "Cve")
@@ -340,7 +340,7 @@ namespace KutCode.Cve.Application.Database.Migrations
 
             modelBuilder.Entity("KutCode.Cve.Domain.Entities.PlatformEntity", b =>
                 {
-                    b.Navigation("VulnerabilityPoints");
+                    b.Navigation("Vulnerabilities");
                 });
 
             modelBuilder.Entity("KutCode.Cve.Domain.Entities.Report.ReportRequestEntity", b =>
@@ -350,7 +350,7 @@ namespace KutCode.Cve.Application.Database.Migrations
 
             modelBuilder.Entity("KutCode.Cve.Domain.Entities.SoftwareEntity", b =>
                 {
-                    b.Navigation("VulnerabilityPoints");
+                    b.Navigation("Vulnerabilities");
                 });
 
             modelBuilder.Entity("KutCode.Cve.Domain.Entities.VulnerabilityPointEntity", b =>

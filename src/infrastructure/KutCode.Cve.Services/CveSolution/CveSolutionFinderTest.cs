@@ -4,8 +4,6 @@ using KutCode.Cve.Domain.Dto.Entities.Report;
 using KutCode.Cve.Domain.Helpers;
 using KutCode.Cve.Domain.Models.Solution;
 using Lifti;
-using Lifti.Querying;
-using Lifti.Querying.QueryParts;
 using Lifti.Tokenization;
 
 namespace KutCode.Cve.Services.CveSolution;
@@ -15,9 +13,9 @@ namespace KutCode.Cve.Services.CveSolution;
  * Если у нас есть что-то одно, платформа или софт - оринтируемся, естественно, на то, что есть.
  * Если у нас есть И платформа И софт вместе - важнее для нас будет именно софт, а уже затем платформа.
 */
-public sealed class CveSolutionFinder : ICveSolutionFinder
+public sealed class CveSolutionFinderTest : ICveSolutionFinder
 {
-public async Task<SolutionFinderResult<VulnerabilityPointEntity>> FindAsync(
+	public async Task<SolutionFinderResult<VulnerabilityPointEntity>> FindAsync(
 		ReportRequestVulnerabilityPointDto vulnerabilityPoint, 
 		IEnumerable<VulnerabilityPointEntity> foundedResolves,
 		CancellationToken ct = default)
@@ -60,19 +58,15 @@ public async Task<SolutionFinderResult<VulnerabilityPointEntity>> FindAsync(
 	{
 		if (string.IsNullOrWhiteSpace(prompt)) return (null, false)!;
 		var promptParts = prompt.Split(' ', '_')
-			.Where(x => x.Length > 1)
-			.Where(x => string.IsNullOrWhiteSpace(x) == false && string.IsNullOrEmpty(x) == false)
-			.Select(x => x.Normalize().Trim())
-			.ToArray();
+			.Where(x => string.IsNullOrWhiteSpace(x) == false).ToArray();
 
 		var str = new StringBuilder();
 		for (int i = 0; i < promptParts.Length; i++)
 		{
-			if (string.IsNullOrWhiteSpace(promptParts[i]) || string.IsNullOrEmpty(promptParts[i])) continue;
-			if (i != 0)
-				str.Append(" | ");
-			str.Append('?');
 			str.Append(promptParts[i].Trim());
+			if (i != promptParts.Length - 1)
+				if (!string.IsNullOrEmpty(promptParts[i]))
+					str.Append(" | ");
 		}
 
 		return (str.ToString(), true);

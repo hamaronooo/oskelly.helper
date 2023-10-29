@@ -47,9 +47,9 @@ public sealed class HandleReportRequestCommandHandler: IRequestHandler<HandleRep
 		// search in DB if need OR/AND
 		// get resolvers by codes
 		
-		//rReq.Value.VulnerabilityPoints
+		//rReq.Value.Vulnerabilities
 
-		var solutionSearchSet = rReq.Value.VulnerabilityPoints
+		var solutionSearchSet = rReq.Value.Vulnerabilities
 			.Join(resolversResults.GroupBy(x => x.CveId),
 				requested => requested.CveId, 
 				loadedResolves => loadedResolves.Key,
@@ -60,10 +60,24 @@ public sealed class HandleReportRequestCommandHandler: IRequestHandler<HandleRep
 		var parallelOptions = new ParallelOptions { CancellationToken = ct, MaxDegreeOfParallelism = 20 };
 		var bag = new ConcurrentBag<SolutionFinderResult<VulnerabilityPointEntity>>();
 
-		await Parallel.ForEachAsync(solutionSearchSet, parallelOptions, async (dto, token) => {
-			SolutionFinderResult<VulnerabilityPointEntity> solutions = await _solutionFinder.FindAsync(dto.RequestedVulnerability, dto.LoadedResolves, token);
-			bag.Add(solutions);
-		});
+		foreach (var s in solutionSearchSet)
+		{
+			try
+			{
+				SolutionFinderResult<VulnerabilityPointEntity> solutions =
+					await _solutionFinder.FindAsync(s.RequestedVulnerability, s.LoadedResolves, ct);
+				bag.Add(solutions);
+			}
+			catch (Exception e)
+			{
+				//swallow
+			}
+		}
+		
+		// await Parallel.ForEachAsync(solutionSearchSet, parallelOptions, async (dto, token) => {
+		// 	SolutionFinderResult<VulnerabilityPointEntity> solutions = await _solutionFinder.FindAsync(dto.RequestedVulnerability, dto.LoadedResolves, token);
+		// 	bag.Add(solutions);
+		// });
 		
 
 		// combine resolves and pick best
@@ -88,7 +102,7 @@ public sealed class HandleReportRequestCommandHandler: IRequestHandler<HandleRep
 
 		var parallelOptions = new ParallelOptions { CancellationToken = ct, MaxDegreeOfParallelism = 20 };
 		var bag = new ConcurrentBag<VulnerabilityPointEntity>();
-		await Parallel.ForEachAsync(rReq.VulnerabilityPoints, parallelOptions, async (dto, token) => {
+		await Parallel.ForEachAsync(rReq.Vulnerabilities, parallelOptions, async (dto, token) => {
 			foreach (var resolver in resolvers) {
 				try {
 					var resolveResult = await resolver.ResolveAsync(new CveId(dto.CveYear, dto.CveCnaNumber), token);

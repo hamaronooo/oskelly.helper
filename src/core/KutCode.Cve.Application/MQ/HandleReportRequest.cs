@@ -4,6 +4,7 @@ using Serilog;
 
 namespace KutCode.Cve.Application.MQ;
 
+public sealed record HandleReportRequestMessage(Guid RequestId);
 public sealed class HandleReportRequestConsumer : IConsumer<HandleReportRequestMessage>
 {
 	private readonly IMediator _mediator;
