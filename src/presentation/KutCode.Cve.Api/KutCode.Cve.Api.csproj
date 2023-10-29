@@ -50,4 +50,8 @@
         <Folder Include="Endpoints\Queue\"/>
     </ItemGroup>
 
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="wwwroot\files\f30635a9-1f93-481d-87ec-d948653a7ccc" />
+    </ItemGroup>
+
 </Project>

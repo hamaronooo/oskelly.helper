@@ -10,7 +10,7 @@ public enum ReportRequestState
 	Unknown = 1,
 	[Description("Создан")]
 	Created = 2,
-	[Description("В оработке")]
+	[Description("В обработке")]
 	Handling = 4,
 	[Description("Успешно обработан")]
 	Success = 8,

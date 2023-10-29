@@ -7,10 +7,8 @@ public sealed class NamesNormalizer
 	// regexes from https://regexlib.com/Search.aspx?k=file+path&AspxAutoDetectCookieSupport=1
 	public static Regex FilePathRegex => new (@"(([a-zA-Z]:)|((\\|\/){1,2}\w+)\$?)((\\|\/)(\w[\w ]*.*))+\.([a-zA-Z0-9]+)");
 
-	public static HashSet<char> CharsToRemove = new(new[]
-	{
-		(char)0,'\0', '\"', '\'', '/', '-', '(', ')', '{', '}', '[', ']', '|', '?', ':', ';', '^', ',', '%', '#', '№', '=', '+',
-		'!', '@'
+	public static HashSet<char> CharsToRemove = new(new[] {
+		(char)0,'\0', '\"', '\'', '/', '-', '(', ')', '{', '}', '[', ']', '|', '?', ':', ';', '^', ',', '%', '#', '№', '=', '+', '!', '@'
 	});
 	
 	public static string NormalizeSoftwareName(string value)

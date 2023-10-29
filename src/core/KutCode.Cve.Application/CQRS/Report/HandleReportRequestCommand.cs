@@ -1,55 +1,80 @@
 ﻿using System.Collections.Concurrent;
 using KutCode.Cve.Application.Database;
 using KutCode.Cve.Application.Interfaces.Cve;
+using KutCode.Cve.Application.Interfaces.Excel;
 using KutCode.Cve.Domain.Dto.Entities.Report;
-using KutCode.Cve.Domain.Entities.Report;
 using KutCode.Cve.Domain.Enums;
 using KutCode.Cve.Domain.Models.Solution;
+using Microsoft.EntityFrameworkCore;
 using Serilog;
 
 namespace KutCode.Cve.Application.CQRS.Report;
 
-public sealed record HandleReportRequestCommand(Guid RequestId) : IRequest<IEnumerable<VulnerabilityPointEntity>>;
+public sealed record HandleReportRequestCommand(Guid RequestId) : IRequest;
 
-public sealed class HandleReportRequestCommandHandler: IRequestHandler<HandleReportRequestCommand, IEnumerable<VulnerabilityPointEntity>>
+public sealed class HandleReportRequestCommandHandler: IRequestHandler<HandleReportRequestCommand>
 {
 	private readonly IMediator _mediator;
 	private readonly MainDbContext _context;
 	private readonly ICveResolverManager _vulnerabilityLoaderManager;
 	private readonly ICveSolutionFinder _solutionFinder;
+	private readonly ICveReportCreator _reportCreator;
+	private readonly IFileService _fileService;
 
 	public HandleReportRequestCommandHandler(
 		IMediator mediator,
 		ICveResolverManager vulnerabilityLoaderManager,
 		MainDbContext context,
-		ICveSolutionFinder solutionFinder)
+		ICveSolutionFinder solutionFinder,
+		ICveReportCreator reportCreator, 
+		IFileService fileService)
 	{
 		_mediator = mediator;
 		_vulnerabilityLoaderManager = vulnerabilityLoaderManager;
 		_context = context;
 		_solutionFinder = solutionFinder;
+		_reportCreator = reportCreator;
+		_fileService = fileService;
 	}
 
-	public async Task<IEnumerable<VulnerabilityPointEntity>> Handle(HandleReportRequestCommand request, CancellationToken ct)
+	public async Task Handle(HandleReportRequestCommand request, CancellationToken ct)
 	{
 		Optional<ReportRequestExtendedDto> rReq = await _mediator.Send(new ExtendedReportByIdQuery(request.RequestId), ct);
-		if (rReq.HasValue is false) return Enumerable.Empty<VulnerabilityPointEntity>();
-
-		_context.ReportRequests
-			.Attach(new ReportRequestEntity {Id = rReq.Value!.Id, State = ReportRequestState.Handling})
-			.Property(x => x.State).IsModified = true;
-		await _context.SaveChangesAsync(ct);
-
-		List<VulnerabilityPointEntity> resolversResults = new();
-		//if (rReq.Value.SearchStrategy.)
-		resolversResults.AddRange(await GetResolvesResult(rReq.Value!, ct));
-
-		// search in DB if need OR/AND
-		// get resolvers by codes
+		if (rReq.HasValue is false) {
+			Log.Warning("{ClassName}; Load request with Id: {Id} not found", GetType().Name, request.RequestId);
+			return;
+		}
+		await _mediator.Send(new ChangeReportRequestCommand(rReq.Value!.Id, ReportRequestState.Handling), ct);
 		
-		//rReq.Value.Vulnerabilities
-
-		var solutionSearchSet = rReq.Value.Vulnerabilities
+		try {
+			await Wrapper(rReq.Value!, ct);
+		}
+		catch {
+			await _mediator.Send(new ChangeReportRequestCommand(rReq.Value!.Id, ReportRequestState.Error), ct);
+			throw;
+		}
+	}
+	
+	public async Task Wrapper(ReportRequestExtendedDto rReq, CancellationToken ct)
+	{
+		// load resolves 
+		List<VulnerabilityPointEntity> resolversResults = new();
+		Log.Information("{ClassName}; ReportSearchStrategy for request with Id: {Id} is {SearchStrategy}", 
+			GetType().Name, rReq.Id, rReq.SearchStrategyName);
+		if (rReq.SearchStrategy == ReportSearchStrategy.Combine) {
+			resolversResults.AddRange(await GetResolvesResult(rReq!, ct));
+			resolversResults.AddRange(await GetDbResolves(rReq!, ct));
+		}
+		if (rReq.SearchStrategy == ReportSearchStrategy.OnlyNew)
+			resolversResults.AddRange(await GetResolvesResult(rReq!, ct));
+		if (rReq.SearchStrategy == ReportSearchStrategy.OnlyStorage)
+			resolversResults.AddRange(await GetDbResolves(rReq!, ct));
+		
+		Log.Information("{ClassName}; Loaded {Count} resolves for report request: {Id}", 
+			GetType().Name, resolversResults.Count, rReq.Id);
+		
+		// joining cve request with loaded resolve
+		var solutionSearchSet = rReq.Vulnerabilities
 			.Join(resolversResults.GroupBy(x => x.CveId),
 				requested => requested.CveId, 
 				loadedResolves => loadedResolves.Key,
@@ -57,41 +82,50 @@ public sealed class HandleReportRequestCommandHandler: IRequestHandler<HandleRep
 					RequestedVulnerability = req, LoadedResolves = res
 				});
 
+		// find solutions 
 		var parallelOptions = new ParallelOptions { CancellationToken = ct, MaxDegreeOfParallelism = 20 };
-		var bag = new ConcurrentBag<SolutionFinderResult<VulnerabilityPointEntity>>();
-
-		foreach (var s in solutionSearchSet)
-		{
-			try
-			{
-				SolutionFinderResult<VulnerabilityPointEntity> solutions =
-					await _solutionFinder.FindAsync(s.RequestedVulnerability, s.LoadedResolves, ct);
-				bag.Add(solutions);
+		var foundSolutions = new ConcurrentBag<SolutionFinderResult<VulnerabilityPointEntity>>();
+		await Parallel.ForEachAsync(solutionSearchSet, parallelOptions, async (dto, token) => {
+			try {
+				SolutionFinderResult<VulnerabilityPointEntity> solutions = await _solutionFinder.FindAsync(dto.RequestedVulnerability, dto.LoadedResolves, token);
+				foundSolutions.Add(solutions);
 			}
-			catch (Exception e)
-			{
+			catch {
 				//swallow
 			}
-		}
-		
-		// await Parallel.ForEachAsync(solutionSearchSet, parallelOptions, async (dto, token) => {
-		// 	SolutionFinderResult<VulnerabilityPointEntity> solutions = await _solutionFinder.FindAsync(dto.RequestedVulnerability, dto.LoadedResolves, token);
-		// 	bag.Add(solutions);
-		// });
-		
+		});
 
-		// combine resolves and pick best
-
-		// publish update CVE queue in need and 
-
-		// return result 
+		Log.Information("{ClassName}; Found {Count} solutions for report request: {Id}", 
+			GetType().Name, foundSolutions.Count, rReq.Id);
 		
-		// now selecting top 1 by score for each CVE
-		return bag.Where(x => x.Best.HasValue)
-			.Select(x => x.Best.Value!);
+		// create and save report 
+		var reportBytes = await _reportCreator.CreateExcelReportAsync(rReq, foundSolutions, ct);
+		await _fileService.SaveFileAsync(reportBytes, rReq.Id, ct);
+		
+		Log.Information("{ClassName}; Report with Id: {Id}, saved SUCCESSFULLY", GetType().Name, rReq.Id);
+		await _mediator.Send(new ChangeReportRequestCommand(rReq.Id, ReportRequestState.Success), ct);
 	}
-	
-	
+
+	#region Help methods
+
+	private async Task<List<VulnerabilityPointEntity>> GetDbResolves(ReportRequestExtendedDto rReqValue, CancellationToken ct)
+	{
+		List<VulnerabilityPointEntity> result = new(rReqValue.Vulnerabilities.Count);
+		foreach (var vulnerability in rReqValue.Vulnerabilities)
+		{
+			var resolves = await _context.VulnerabilityPoints.AsNoTracking()
+				.Include(x => x.Platform)
+				.Include(x => x.Software)
+				.Include(x => x.CveSolutions)
+				.Where(x => x.CveYear == vulnerability.CveYear
+				            && x.CveCnaNumber == vulnerability.CveCnaNumber)
+				.ToListAsync(ct);
+			result.AddRange(resolves);
+		}
+		return result;
+	}
+
+
 	private async Task<List<VulnerabilityPointEntity>> GetResolvesResult(ReportRequestExtendedDto rReq, CancellationToken ct)
 	{
 		List<ICveResolver> resolvers = new(rReq.Sources.Length);
@@ -107,7 +141,14 @@ public sealed class HandleReportRequestCommandHandler: IRequestHandler<HandleRep
 				try {
 					var resolveResult = await resolver.ResolveAsync(new CveId(dto.CveYear, dto.CveCnaNumber), token);
 					foreach (var result in resolveResult)
+					{
+						result.CveYear = dto.CveYear;
+						result.CveCnaNumber = dto.CveCnaNumber;
+						result.Description = dto.CveDescription;
+						result.Platform ??= new PlatformEntity() { Name = dto.Platform ?? string.Empty };
+						result.Software ??= new SoftwareEntity() { Name = dto.Software ?? string.Empty };
 						bag.Add(result);
+					}
 				}
 				catch (Exception e) {
 					Log.Error(e, "Resolver Error; Resolver code: {Code}; CveString: {Cve}", resolver.Code, dto.CveString);
@@ -117,4 +158,6 @@ public sealed class HandleReportRequestCommandHandler: IRequestHandler<HandleRep
 		});
 		return bag.ToList();
 	}
+
+	#endregion
 }

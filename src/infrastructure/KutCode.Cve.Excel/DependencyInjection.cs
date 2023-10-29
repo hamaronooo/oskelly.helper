@@ -1,5 +1,6 @@
 ﻿
 using KutCode.Cve.Application.Interfaces.Excel;
+using KutCode.Cve.Excel.Creators;
 using KutCode.Cve.Excel.Parsers;
 using Microsoft.Extensions.DependencyInjection;
 using OfficeOpenXml;
@@ -12,6 +13,7 @@ public static class DependencyInjection
 	{
 		ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
 		services.AddScoped<IReportRequestParser, ReportRequestParser>();
+		services.AddScoped<ICveReportCreator, CveReportCreator>();
 		return services;
 	}
 }

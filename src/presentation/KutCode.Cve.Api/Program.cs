@@ -23,7 +23,7 @@ builder.AddFastEndpoints()
 builder.Services.AddMediatR(x => x.RegisterServicesFromAssemblies(typeof(KutCode.Cve.Application.AssemblyInfo).Assembly));
 builder.Services.AddMainDbContext(builder.Configuration.GetConnectionString("Main")!);
 builder.Services.AddHostedService<WarmUpService>();
-builder.Services.AddHostedService<CveLoaderProcessorService>();
+//builder.Services.AddHostedService<CveLoaderProcessorService>(); 
 builder.Services.AddCveResolverProcessor();
 builder.Services.AddServices();
 builder.Services.AddFileService(builder.Environment.WebRootPath);

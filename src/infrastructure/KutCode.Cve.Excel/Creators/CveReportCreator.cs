@@ -1,10 +1,29 @@
-﻿using OfficeOpenXml;
-using OfficeOpenXml.Table;
+﻿using System.Drawing;
+using KutCode.Cve.Application.Interfaces.Excel;
+using KutCode.Cve.Domain.Dto.Entities.Report;
+using KutCode.Cve.Domain.Entities;
+using KutCode.Cve.Domain.Models.Solution;
+using OfficeOpenXml;
 
 namespace KutCode.Cve.Excel.Creators;
 
-public class CveReportCreator
+public sealed class CveReportCreator : ICveReportCreator
 {
+    public async Task<byte[]> CreateExcelReportAsync(ReportRequestExtendedDto reportRequest, IEnumerable<SolutionFinderResult<VulnerabilityPointEntity>> vulnerabilities,
+        CancellationToken ct = default)
+    {
+        ExcelPackage package = new ();
+        var successSheet = package.Workbook.Worksheets.Add("Успешно найдено");
+        successSheet.TabColor = Color.LimeGreen;
+        var errorSheet = package.Workbook.Worksheets.Add("Не найдено");
+        errorSheet.TabColor = Color.Red;
+        
+        //dowor
+
+        return await package.GetAsByteArrayAsync(ct);
+    }
+
+    
     // public static byte[] GetReport(IEnumerable<ReportDbModel> models)
     // {
     //     ExcelPackage package = new ();
@@ -42,4 +61,6 @@ public class CveReportCreator
     //     
     //     return package.GetAsByteArray();
     // }
+
+  
 }
