@@ -15,6 +15,7 @@ public sealed class CveResolverManager : ICveResolverManager
 	public Optional<ICveResolver> GetResolver(string resolverCode) => resolverCode switch
 	{
 		"msrc" => _scope.ServiceProvider.GetRequiredService<MicrosoftCveResolver>(),
+		"msrc_old" => _scope.ServiceProvider.GetRequiredService<MicrosoftOldCveResolver>(),
 		_ => Optional<ICveResolver>.None
 	};
 }

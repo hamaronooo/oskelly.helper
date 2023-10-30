@@ -20,10 +20,13 @@ public static class DependencyInjection
 			});
 		services.AddScoped<MicrosoftSecurityApiRepository>();
 
-		services.AddScoped<ICveResolveQueueManager, CveResolveQueueManager>();
-		services.AddSingleton<ICveResolverManager, CveResolverManager>();
-		services.AddSingleton<ICveLoaderManager, CveLoaderManager>();
+		// resolvers
 		services.AddScoped<MicrosoftCveResolver>();
+		services.AddScoped<MicrosoftOldCveResolver>();
+		services.AddSingleton<ICveResolverManager, CveResolverManager>();
+		
+		services.AddScoped<ICveResolveQueueManager, CveResolveQueueManager>();
+		services.AddSingleton<ICveLoaderManager, CveLoaderManager>();
 		services.AddScoped<MitreCveLoader>();
 		services.AddScoped<ICveSolutionFinder, CveSolutionFinder>();
 		

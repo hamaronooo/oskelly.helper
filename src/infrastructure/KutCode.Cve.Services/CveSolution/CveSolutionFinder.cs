@@ -25,7 +25,7 @@ public sealed class CveSolutionFinder : ICveSolutionFinder
 		var resolvesList = foundedResolves?.ToList();
 		if (resolvesList is null || resolvesList.Count() == 0)
 			return new SolutionFinderResult<VulnerabilityPointEntity>();
-
+ 
 		var platformIndex = await GetPlatformIndex(resolvesList, ct);
 		var softwareIndex = await GetSoftwareIndex(resolvesList, ct);
 		List<(Guid Id, double Score)> results = new();
@@ -54,7 +54,7 @@ public sealed class CveSolutionFinder : ICveSolutionFinder
 			.Join(resolvesList, arg => arg.Key, entity => entity.Id,
 				(searchResult, entity) =>
 				{
-					return new SolutionFinderResultItem<VulnerabilityPointEntity>(entity, searchResult.Total);
+					return new SolutionFinderResultItem<VulnerabilityPointEntity>(vulnerabilityPoint.CveId,  entity, searchResult.Total);
 				});
 		return new SolutionFinderResult<VulnerabilityPointEntity>(result);
 	}

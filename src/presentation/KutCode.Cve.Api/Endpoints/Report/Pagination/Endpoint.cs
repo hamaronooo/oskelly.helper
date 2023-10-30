@@ -3,6 +3,7 @@ using KutCode.Cve.Application.CQRS.Report;
 using KutCode.Cve.Domain.Dto;
 using KutCode.Cve.Domain.Dto.Entities.Report;
 using MediatR;
+using Microsoft.AspNetCore.Mvc;
 
 namespace KutCode.Cve.Api.Endpoints.Report.Pagination;
 
@@ -18,10 +19,10 @@ public sealed class Endpoint : Endpoint<PaginationRequest, PaginationResponse<Re
 	{
 		AllowAnonymous();
 		Version(1);
-		Post("report/pagination");
+		Get("report/pagination");
 	}
 
-	public override  async Task HandleAsync(PaginationRequest req, CancellationToken ct)
+	public override  async Task HandleAsync([FromQuery] PaginationRequest req, CancellationToken ct)
 	{
 		var result = await _mediator.Send(new ReportPaginationQuery(req), ct);
 		await SendOkAsync(result, ct);
