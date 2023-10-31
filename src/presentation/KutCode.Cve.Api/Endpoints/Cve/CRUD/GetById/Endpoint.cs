@@ -18,14 +18,14 @@ public class Endpoint : EndpointWithoutRequest<CveDto>
 	{
 		Version(1);
 		AllowAnonymous();
-		Get("cve/byId/{CveId}");
+		Get("cve/byId/{CveString}");
 	}
 
 	public override async Task HandleAsync(CancellationToken ct)
 	{
-		var cveId = CveId.Parse(Route<string>("CveId"));
+		var cveId = CveId.Parse(Route<string>("CveString"));
 		var result = await _mediator.Send(new GetCveByIdQuery(cveId), ct);
-		if (result is null) ThrowError("CVE not found", 404);
-		await SendOkAsync(result, ct);
+		if (result.HasValue == false) ThrowError("CVE not found", 404);
+		await SendOkAsync(result.Value!, ct);
 	}
 }

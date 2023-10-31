@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using KutCode.Cve.Application.CQRS.Cve;
-using KutCode.Cve.Domain.Models.CveResolver;
+using KutCode.Cve.Application.Interfaces.Cve;
+using KutCode.Cve.Domain.Models.CveVulnerabilityLoader;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
@@ -46,7 +47,7 @@ public class CveResolveProcessor
 			Log.Information("{ClassName}; Start finding resolves for CVE: {Cve} with finder code: {FCode}", 
 				GetType().Name, nextItem.CveId, nextItem.ResolverCode);
 			try {
-				await _mediatr.Send(new ResolveCveCommand(new SingleCveResolveRequest {
+				await _mediatr.Send(new ResolveCveCommand(new SingleCveVulnerabilityLoadRequest {
 					CveId = nextItem.CveId,
 					Priority = nextItem.Priority,
 					ResolverCode = nextItem.ResolverCode,
@@ -54,7 +55,7 @@ public class CveResolveProcessor
 				}), ct);
 			}
 			catch (Exception e) {
-				Log.Error(e, "Error in cve finder work, cve: {CveId}; finder: {FinderCode}", nextItem.CveId, nextItem.ResolverCode);
+				Log.Error(e, "Error in cve finder work, cve: {CveString}; resolver: {ResolverCode}", nextItem.CveId, nextItem.ResolverCode);
 			}
 		}
 		

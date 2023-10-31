@@ -1,5 +1,4 @@
 ﻿using KutCode.Cve.Application.Database;
-using MediatR;
 
 namespace KutCode.Cve.Application.CQRS.Cve;
 

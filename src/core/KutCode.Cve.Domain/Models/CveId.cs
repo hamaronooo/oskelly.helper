@@ -5,7 +5,7 @@
 /// Where YYYY - is CVE publishing year.
 /// And XXXX - is CNA code
 /// </summary>
-public readonly struct CveId : IEquatable<CveId>
+public readonly struct CveId : IEquatable<CveId>, IComparable<CveId>
 {
 	private const string CvePrefix = "cve";
 	private readonly int _year;
@@ -31,6 +31,18 @@ public readonly struct CveId : IEquatable<CveId>
 		if (firstPart != CvePrefix && parts.Length > 2) throw new ArgumentException("Wrong CVE id string");
 		return new CveId(int.Parse(parts[0]), parts[1]);
 	}
+
+	public static bool TryParse(string cveIdAsString, out CveId? value)
+	{
+		try {
+			value = Parse(cveIdAsString);
+			return true;
+		}
+		catch {
+			value = null;
+			return false;
+		}
+	}
 	
 	public CveId(int year, string cnaNumber)
 	{
@@ -52,6 +64,13 @@ public readonly struct CveId : IEquatable<CveId>
 	/// Used on third place in CVE ID: CVE-....-XXXX
 	/// </summary>
 	public string CnaNumber => _cnaNumber;
+
+	public bool TryParseCna(out int cnaAsNumber)
+	{
+		var isParsed = int.TryParse(_cnaNumber, out var pCna);
+		cnaAsNumber = pCna;
+		return isParsed;
+	}
 
 	public override string ToString() => AsString;
 	
@@ -77,5 +96,17 @@ public readonly struct CveId : IEquatable<CveId>
 	public override int GetHashCode()
 	{
 		return HashCode.Combine(_year, _cnaNumber);
+	}
+
+	public int CompareTo(CveId other)
+	{
+		var yearComparison = _year - other._year;
+		if (yearComparison != 0) return yearComparison;
+		var isMyCnaParsed = this.TryParseCna(out var myCna);
+		var isOtherCnaParsed = other.TryParseCna(out var otherCna);
+		if (!(isMyCnaParsed & isOtherCnaParsed)) return 0;
+		if (isMyCnaParsed is false) return -1;
+		if (isOtherCnaParsed is false) return 1;
+		return myCna - otherCna;
 	}
 }

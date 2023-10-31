@@ -1,9 +1,10 @@
 ﻿using KutCode.Cve.Application.Interfaces;
+using KutCode.Cve.Application.Interfaces.Cve;
 using KutCode.Cve.Domain.Dto;
 
 namespace KutCode.Cve.Api.Endpoints.Queue.GetQueueState;
 
-public class Endpoint : EndpointWithoutRequest<CveFinderQueueState>
+public class Endpoint : EndpointWithoutRequest<CveResolverQueueState>
 {
 	private readonly ICveResolveQueueManager _manager;
 
@@ -19,7 +20,7 @@ public class Endpoint : EndpointWithoutRequest<CveFinderQueueState>
 		Get("queue/resolve");
 	}
 
-	public override async Task<CveFinderQueueState> ExecuteAsync(CancellationToken ct)
+	public override async Task<CveResolverQueueState> ExecuteAsync(CancellationToken ct)
 	{
 		return await _manager.GetStateAsync(ct);
 	}

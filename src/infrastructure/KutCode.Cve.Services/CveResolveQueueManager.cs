@@ -1,6 +1,7 @@
 ﻿using KutCode.Cve.Application.Database;
+using KutCode.Cve.Application.Interfaces.Cve;
 using KutCode.Cve.Domain.Dto;
-using KutCode.Cve.Domain.Models.CveResolver;
+using KutCode.Cve.Domain.Models.CveVulnerabilityLoader;
 using Microsoft.EntityFrameworkCore;
 
 namespace KutCode.Cve.Services;
@@ -16,30 +17,30 @@ public sealed class CveResolveQueueManager : ICveResolveQueueManager
 
 	public async Task AddRangeAsync(List<CveResolveQueueEntity> loadRequest, CancellationToken ct = default)
 	{
-		await _context.CveFinderQueue.UpsertRange(loadRequest)
-			.On(x => new { x.CveCnaNumber, x.CveYear, FinderCode = x.ResolverCode })
+		await _context.CveResolveQueue.UpsertRange(loadRequest)
+			.On(x => new { x.CveCnaNumber, x.CveYear, x.ResolverCode })
 			.NoUpdate()
 			.RunAsync(ct);
 	}
 
 	public async Task AddAsync(CveResolveQueueEntity loadRequest, CancellationToken ct = default)
 	{
-		await _context.CveFinderQueue.Upsert(loadRequest)
-			.On(x => new { x.CveCnaNumber, x.CveYear, FinderCode = x.ResolverCode })
+		await _context.CveResolveQueue.Upsert(loadRequest)
+			.On(x => new { x.CveCnaNumber, x.CveYear, x.ResolverCode })
 			.NoUpdate()
 			.RunAsync(ct);
 	}
 
-	public async Task AddByYearAsync(YearCveResolveRequest resolveRequest, CancellationToken ct = default)
+	public async Task AddByYearAsync(YearCveVulnerabilityLoadRequest vulnerabilityLoadRequest, CancellationToken ct = default)
 	{
 		var entities = await _context.Cve
 			.AsNoTracking()
-			.Where(x => x.Year == resolveRequest.Year)
-			.Select(x => new CveResolveQueueEntity(x.Year, x.CnaNumber, resolveRequest.ResolverCode, resolveRequest.Priority))
+			.Where(x => x.Year == vulnerabilityLoadRequest.Year)
+			.Select(x => new CveResolveQueueEntity(x.Year, x.CnaNumber, vulnerabilityLoadRequest.ResolverCode, vulnerabilityLoadRequest.Priority))
 			.ToListAsync(ct);
 
-		await _context.CveFinderQueue.UpsertRange(entities)
-			.On(x => new { x.CveCnaNumber, x.CveYear, FinderCode = x.ResolverCode })
+		await _context.CveResolveQueue.UpsertRange(entities)
+			.On(x => new { x.CveCnaNumber, x.CveYear, x.ResolverCode })
 			.NoUpdate()
 			.RunAsync(ct);
 	}
@@ -48,7 +49,7 @@ public sealed class CveResolveQueueManager : ICveResolveQueueManager
 	{
 		try
 		{
-			_context.CveFinderQueue.Remove(loadRequest);
+			_context.CveResolveQueue.Remove(loadRequest);
 			await _context.SaveChangesAsync(ct);
 		}
 		catch
@@ -61,7 +62,7 @@ public sealed class CveResolveQueueManager : ICveResolveQueueManager
 	{
 		try
 		{
-			_context.CveFinderQueue.RemoveRange(loadRequest);
+			_context.CveResolveQueue.RemoveRange(loadRequest);
 			await _context.SaveChangesAsync(ct);
 		}
 		catch
@@ -72,17 +73,17 @@ public sealed class CveResolveQueueManager : ICveResolveQueueManager
 
 	public async Task<List<CveResolveQueueEntity>> GetNextAsync(int count, CancellationToken ct = default)
 	{
-		return await _context.CveFinderQueue.AsNoTracking()
+		return await _context.CveResolveQueue.AsNoTracking()
 			.OrderByDescending(x => x.Priority)
 			.ThenBy(x => x.SysCreated)
 			.Take(count)
 			.ToListAsync(ct);
 	}
 
-	public async Task<CveFinderQueueState> GetStateAsync(CancellationToken ct = default)
+	public async Task<CveResolverQueueState> GetStateAsync(CancellationToken ct = default)
 	{
-		var result = new CveFinderQueueState();
-		result.Yearly = await _context.CveFinderQueue.AsNoTracking()
+		var result = new CveResolverQueueState();
+		result.Yearly = await _context.CveResolveQueue.AsNoTracking()
 			.GroupBy(x => x.CveYear)
 			.ToDictionaryAsync(x => x.Key, x => x.Count(), ct);
 		return result;
@@ -90,7 +91,7 @@ public sealed class CveResolveQueueManager : ICveResolveQueueManager
 
 	public async Task FlushQueueAsync(CancellationToken ct = default)
 	{
-		await _context.CveFinderQueue.ExecuteDeleteAsync(ct);
+		await _context.CveResolveQueue.ExecuteDeleteAsync(ct);
 		await _context.SaveChangesAsync(ct);
 	}
 }

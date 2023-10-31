@@ -20,7 +20,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KutCode.Cve.Domain.Tests", 
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RawTests", "tests\RawTests\RawTests.csproj", "{95E1BB50-B7FF-4DA5-8443-09C93E1258E4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KutCode.Cve.ReportCreator", "src\infrastructure\KutCode.Cve.ReportCreator\KutCode.Cve.ReportCreator.csproj", "{5BD8352C-2394-46BC-9274-BADFBA3FCF92}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KutCode.Cve.Excel", "src\infrastructure\KutCode.Cve.Excel\KutCode.Cve.Excel.csproj", "{5BD8352C-2394-46BC-9274-BADFBA3FCF92}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

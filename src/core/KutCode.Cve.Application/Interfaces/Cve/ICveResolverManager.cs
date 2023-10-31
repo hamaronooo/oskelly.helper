@@ -2,5 +2,5 @@
 
 public interface ICveResolverManager
 {
-	ICveResolver? GetResolver(string resolverCode);
+	Optional<ICveResolver> GetResolver(string resolverCode);
 }

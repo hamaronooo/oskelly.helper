@@ -15,19 +15,22 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <ProjectReference Include="..\..\infrastructure\KutCode.Cve.Excel\KutCode.Cve.Excel.csproj" />
         <ProjectReference Include="..\..\infrastructure\KutCode.Cve.Services\KutCode.Cve.Services.csproj"/>
     </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="AutoMapper" Version="12.0.1"/>
         <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1"/>
+        <PackageReference Include="EPPlus" Version="6.2.10" />
         <PackageReference Include="FastEndpoints" Version="5.18.0"/>
         <PackageReference Include="FastEndpoints.Swagger" Version="5.18.0"/>
+        <PackageReference Include="KutCode.Optionality" Version="0.0.4" />
         <PackageReference Include="MassTransit" Version="8.1.1"/>
         <PackageReference Include="MassTransit.Extensions.DependencyInjection" Version="7.3.1"/>
         <PackageReference Include="MassTransit.RabbitMQ" Version="8.1.1"/>
         <PackageReference Include="MediatR" Version="12.1.1"/>
-        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.12">
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.13">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
@@ -45,6 +48,10 @@
     <ItemGroup>
         <Folder Include="Endpoints\Cve\CRUD\"/>
         <Folder Include="Endpoints\Queue\"/>
+    </ItemGroup>
+
+    <ItemGroup>
+      <_ContentIncludedByDefault Remove="wwwroot\files\f30635a9-1f93-481d-87ec-d948653a7ccc" />
     </ItemGroup>
 
 </Project>

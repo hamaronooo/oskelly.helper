@@ -17,7 +17,7 @@ namespace KutCode.Cve.Application.Database.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.12")
+                .HasAnnotation("ProductVersion", "7.0.13")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -149,7 +149,40 @@ namespace KutCode.Cve.Application.Database.Migrations
                     b.ToTable("platform");
                 });
 
-            modelBuilder.Entity("KutCode.Cve.Domain.Entities.Report.ReportRequestCveEntity", b =>
+            modelBuilder.Entity("KutCode.Cve.Domain.Entities.Report.ReportRequestEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("CustomName")
+                        .HasColumnType("text")
+                        .HasColumnName("custom_name");
+
+                    b.Property<int>("SearchStrategy")
+                        .HasColumnType("integer")
+                        .HasColumnName("search_strategy");
+
+                    b.Property<string>("SourcesRaw")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("sources");
+
+                    b.Property<int>("State")
+                        .HasColumnType("integer")
+                        .HasColumnName("state");
+
+                    b.Property<DateTime>("SysCreated")
+                        .HasColumnType("timestamp without time zone")
+                        .HasColumnName("sys_created");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("report_request");
+                });
+
+            modelBuilder.Entity("KutCode.Cve.Domain.Entities.Report.ReportRequestVulnerabilityPointEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -181,36 +214,7 @@ namespace KutCode.Cve.Application.Database.Migrations
 
                     b.HasIndex("ReportRequestId");
 
-                    b.ToTable("report_request_cve");
-                });
-
-            modelBuilder.Entity("KutCode.Cve.Domain.Entities.Report.ReportRequestEntity", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("id");
-
-                    b.Property<string>("CustomName")
-                        .HasColumnType("text")
-                        .HasColumnName("custom_name");
-
-                    b.Property<int>("SearchStrategy")
-                        .HasColumnType("integer")
-                        .HasColumnName("search_strategy");
-
-                    b.Property<string>("SourcesRaw")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("sources");
-
-                    b.Property<int>("State")
-                        .HasColumnType("integer")
-                        .HasColumnName("state");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("report_request");
+                    b.ToTable("report_request_vulnerability_point");
                 });
 
             modelBuilder.Entity("KutCode.Cve.Domain.Entities.SoftwareEntity", b =>
@@ -295,10 +299,10 @@ namespace KutCode.Cve.Application.Database.Migrations
                     b.Navigation("VulnerabilityPoint");
                 });
 
-            modelBuilder.Entity("KutCode.Cve.Domain.Entities.Report.ReportRequestCveEntity", b =>
+            modelBuilder.Entity("KutCode.Cve.Domain.Entities.Report.ReportRequestVulnerabilityPointEntity", b =>
                 {
                     b.HasOne("KutCode.Cve.Domain.Entities.Report.ReportRequestEntity", "ReportRequest")
-                        .WithMany("Cve")
+                        .WithMany("Vulnerabilities")
                         .HasForeignKey("ReportRequestId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -309,11 +313,11 @@ namespace KutCode.Cve.Application.Database.Migrations
             modelBuilder.Entity("KutCode.Cve.Domain.Entities.VulnerabilityPointEntity", b =>
                 {
                     b.HasOne("KutCode.Cve.Domain.Entities.PlatformEntity", "Platform")
-                        .WithMany("VulnerabilityPoints")
+                        .WithMany("Vulnerabilities")
                         .HasForeignKey("PlatformId");
 
                     b.HasOne("KutCode.Cve.Domain.Entities.SoftwareEntity", "Software")
-                        .WithMany("VulnerabilityPoints")
+                        .WithMany("Vulnerabilities")
                         .HasForeignKey("SoftwareId");
 
                     b.HasOne("KutCode.Cve.Domain.Entities.CveEntity", "Cve")
@@ -336,17 +340,17 @@ namespace KutCode.Cve.Application.Database.Migrations
 
             modelBuilder.Entity("KutCode.Cve.Domain.Entities.PlatformEntity", b =>
                 {
-                    b.Navigation("VulnerabilityPoints");
+                    b.Navigation("Vulnerabilities");
                 });
 
             modelBuilder.Entity("KutCode.Cve.Domain.Entities.Report.ReportRequestEntity", b =>
                 {
-                    b.Navigation("Cve");
+                    b.Navigation("Vulnerabilities");
                 });
 
             modelBuilder.Entity("KutCode.Cve.Domain.Entities.SoftwareEntity", b =>
                 {
-                    b.Navigation("VulnerabilityPoints");
+                    b.Navigation("Vulnerabilities");
                 });
 
             modelBuilder.Entity("KutCode.Cve.Domain.Entities.VulnerabilityPointEntity", b =>

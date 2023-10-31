@@ -11,4 +11,8 @@
       <ProjectReference Include="..\..\src\infrastructure\KutCode.Cve.Services\KutCode.Cve.Services.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="KutCode.Optionality" Version="0.0.4" />
+    </ItemGroup>
+
 </Project>

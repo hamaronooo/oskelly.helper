@@ -17,7 +17,10 @@ public sealed class ReportRequestEntity : ModelWithId<Guid>
 
 	[Column("search_strategy")]
 	public ReportSearchStrategy SearchStrategy { get; set; } = ReportSearchStrategy.Combine;
-
+	
+	[Column("sys_created", TypeName = "timestamp without time zone")]
+	public DateTime SysCreated { get; set; } = DateTime.Now;
+	
 	/// <summary>
 	/// Resolver Code через разделитель ';'
 	/// </summary>
@@ -27,5 +30,5 @@ public sealed class ReportRequestEntity : ModelWithId<Guid>
 	public string[] Sources => SourcesRaw.Split(';');
 	public void SetSources(IEnumerable<string> sources) => SourcesRaw = string.Join(';', sources.Select(x => x.Trim().ToLower()).Distinct());
 
-	public ICollection<ReportRequestCveEntity> Cve { get; set; } = new List<ReportRequestCveEntity>();
+	public ICollection<ReportRequestVulnerabilityPointEntity> Vulnerabilities { get; set; } = new List<ReportRequestVulnerabilityPointEntity>();
 }
