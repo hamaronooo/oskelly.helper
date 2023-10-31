@@ -11,4 +11,5 @@
     &lt;TestId&gt;NUnit3x::B7DBDAB1-DA7A-492B-B006-704A5C5BB166::net7.0::KutCode.Cve.Domain.Tests.CveId_Tests.IComparableParsing_Test&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=msrc/@EntryIndexedValue">True</s:Boolean>
 	</wpf:ResourceDictionary>

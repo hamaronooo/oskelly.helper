@@ -1,5 +1,7 @@
 ﻿using KutCode.Cve.Application.Interfaces.Cve;
+using KutCode.Cve.Domain.Static;
 using KutCode.Cve.Services.ApiRepositories.Microsoft;
+using KutCode.Cve.Services.ApiRepositories.Mitre;
 using KutCode.Cve.Services.CveLoad;
 using KutCode.Cve.Services.CveResolve;
 using KutCode.Cve.Services.CveSolution;
@@ -13,12 +15,18 @@ public static class DependencyInjection
 {
 	public static IServiceCollection AddServices(this IServiceCollection services)
 	{
-		services.AddHttpClient("msrc")
+		services.AddHttpClient(HttpClientNames.Msrc)
+			.ConfigureHttpMessageHandlerBuilder(c => new HttpClientHandler
+			{
+				MaxConnectionsPerServer = 20
+			});
+		services.AddHttpClient(HttpClientNames.Mitre)
 			.ConfigureHttpMessageHandlerBuilder(c => new HttpClientHandler
 			{
 				MaxConnectionsPerServer = 20
 			});
 		services.AddScoped<MicrosoftSecurityApiRepository>();
+		services.AddScoped<MitreApiRepository>();
 
 		// resolvers
 		services.AddScoped<MicrosoftCveResolver>();

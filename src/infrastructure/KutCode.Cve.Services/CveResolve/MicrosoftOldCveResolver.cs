@@ -2,6 +2,7 @@
 using KutCode.Cve.Domain.Enums;
 using KutCode.Cve.Services.ApiRepositories.Microsoft;
 using KutCode.Cve.Services.ApiRepositories.Microsoft.Models;
+using KutCode.Cve.Services.ApiRepositories.Mitre;
 
 namespace KutCode.Cve.Services.CveResolve;
 
@@ -11,10 +12,14 @@ namespace KutCode.Cve.Services.CveResolve;
 public sealed class MicrosoftOldCveResolver : ICveResolver
 {
 	private readonly MicrosoftSecurityApiRepository _msrcApi;
+	private readonly MitreApiRepository _mitreApi;
 
-	public MicrosoftOldCveResolver(MicrosoftSecurityApiRepository msrcApi)
+	public MicrosoftOldCveResolver(
+		MicrosoftSecurityApiRepository msrcApi,
+		MitreApiRepository mitreApi)
 	{
 		_msrcApi = msrcApi;
+		_mitreApi = mitreApi;
 	}
 
 	public string Code => "msrc_old";
