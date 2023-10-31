@@ -1,5 +1,5 @@
 ﻿
-using KutCode.Cve.Application.Hubs;
+using KutCode.Cve.Api.Hubs;
 
 namespace KutCode.Cve.Api.Configuration;
 
@@ -15,8 +15,7 @@ public static class SignalRConfiguration
 	
 	public static WebApplication UseSignalR(this WebApplication app)
 	{
-		app.MapHub<ReportHub>("/ws/report");
-
+		app.MapHub<WsHub>("/ws");
 		return app;
 	}
 }
