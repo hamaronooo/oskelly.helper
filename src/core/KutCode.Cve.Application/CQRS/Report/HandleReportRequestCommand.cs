@@ -44,13 +44,13 @@ public sealed class HandleReportRequestCommandHandler: IRequestHandler<HandleRep
 			Log.Warning("{ClassName}; Load request with Id: {Id} not found", GetType().Name, request.RequestId);
 			return;
 		}
-		await _mediator.Send(new ChangeReportRequestCommand(rReq.Value!.Id, ReportRequestState.Handling), ct);
+		await _mediator.Send(new ChangeReportRequestStateCommand(rReq.Value!.Id, ReportRequestState.Handling), ct);
 		
 		try {
 			await Wrapper(rReq.Value!, ct);
 		}
 		catch {
-			await _mediator.Send(new ChangeReportRequestCommand(rReq.Value!.Id, ReportRequestState.Error), ct);
+			await _mediator.Send(new ChangeReportRequestStateCommand(rReq.Value!.Id, ReportRequestState.Error), ct);
 			throw;
 		}
 	}
@@ -103,7 +103,7 @@ public sealed class HandleReportRequestCommandHandler: IRequestHandler<HandleRep
 		await _fileService.SaveFileAsync(reportBytes, rReq.Id, ct);
 		
 		Log.Information("{ClassName}; Report with Id: {Id}, saved SUCCESSFULLY", GetType().Name, rReq.Id);
-		await _mediator.Send(new ChangeReportRequestCommand(rReq.Id, ReportRequestState.Success), ct);
+		await _mediator.Send(new ChangeReportRequestStateCommand(rReq.Id, ReportRequestState.Success), ct);
 	}
 
 	#region Help methods

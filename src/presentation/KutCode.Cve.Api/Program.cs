@@ -8,7 +8,9 @@ using System.Text.Json.Serialization;
 using FastEndpoints.Swagger;
 using KutCode.Cve.Api.Configuration;
 using KutCode.Cve.Api.Hosted;
+using KutCode.Cve.Api.Services;
 using KutCode.Cve.Application.Database;
+using KutCode.Cve.Application.Interfaces;
 using KutCode.Cve.Excel;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,6 +20,7 @@ builder.AddFastEndpoints()
 	.ConfigureCors()
 	.ConfigureSwagger()
 	.AddMassTransitConfiguration()
+	.ConfigureSignalR()
 	.ConfigureSerilogLogging();
 
 builder.Services.AddMediatR(x => x.RegisterServicesFromAssemblies(typeof(KutCode.Cve.Application.AssemblyInfo).Assembly));
@@ -31,6 +34,7 @@ builder.Services.AddExcelServices();
 builder.Services.AddAuthentication();
 builder.Services.AddAuthorization();
 builder.Services.AddAutoMapper(typeof(KutCode.Cve.Domain.AssemblyInfo), typeof(Program));
+builder.Services.AddScoped<IWebsocketHandler, WebsocketHandler>();
 
 var app = builder.Build();
 app.UseSerilogRequestLogging();
@@ -49,6 +53,7 @@ app.UseFastEndpoints(c => {
 	c.Versioning.PrependToRoute = true;
 	c.Serializer.Options.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
 });
+app.UseSignalR();
 app.UseSwaggerGen();
 
 app.Urls.Add(app.Configuration.GetRequiredSection("ListenOn").Get<string>()!);
