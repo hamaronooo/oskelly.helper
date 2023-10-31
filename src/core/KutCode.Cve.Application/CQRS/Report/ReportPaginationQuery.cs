@@ -17,12 +17,13 @@ public sealed class ReportPaginationQueryHandler : IRequestHandler<ReportPaginat
 
 	public async Task<PaginationResponse<ReportRequestDto>> Handle(ReportPaginationQuery request, CancellationToken ct)
 	{
+		var total = await _context.ReportRequests.AsNoTracking().CountAsync(ct);
 		var items = await _context.ReportRequests.AsNoTracking()
 			.OrderByDescending(x => x.SysCreated)
 			.Skip((request.Request.Page - 1) * request.Request.OnPage)
 			.Take(request.Request.OnPage)
 			.Select(x => _mapper.Map<ReportRequestDto>(x))
 			.ToListAsync(ct);
-		return new PaginationResponse<ReportRequestDto>(request.Request, items);
+		return new PaginationResponse<ReportRequestDto>(request.Request, items, total);
 	}
 }
