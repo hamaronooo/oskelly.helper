@@ -2,6 +2,7 @@
 using KutCode.Cve.Application.Interfaces;
 using KutCode.Cve.Domain.Enums;
 using Microsoft.AspNetCore.SignalR;
+using Newtonsoft.Json;
 
 namespace KutCode.Cve.Api.Services;
 
@@ -15,6 +16,7 @@ public sealed class WebsocketHandler : IWebsocketHandler
 
 	public async Task SendReportStateAsync(Guid reportId, ReportRequestState state, CancellationToken ct = default)
 	{
-		await _reportHub.Clients.All.SendAsync("update_report_state", new { reportId, state }, ct);
+		var json = JsonConvert.SerializeObject(new {reportId, state, stateName = EnumHelper.GetDescriptionValue(state)}, Formatting.None);
+		await _reportHub.Clients.All.SendAsync("update_report_state", json, ct);
 	}
 }

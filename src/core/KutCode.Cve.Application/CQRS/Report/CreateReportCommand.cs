@@ -4,6 +4,7 @@ using KutCode.Cve.Domain.Dto.Entities.Report;
 using KutCode.Cve.Domain.Entities.Report;
 using KutCode.Cve.Domain.Enums;
 using MassTransit;
+using Serilog;
 
 namespace KutCode.Cve.Application.CQRS.Report;
 
@@ -26,19 +27,10 @@ public sealed class CreateReportCommandHandler : IRequestHandler<CreateReportCom
 		entity.Id = Guid.NewGuid();
 		entity.State = ReportRequestState.Created;
 		entity.SysCreated = DateTime.Now.ToLocalTime();
-		using var trans = await _context.Database.BeginTransactionAsync(ct);
 		await _context.ReportRequests.AddAsync(entity, ct);
 		await _context.SaveChangesAsync(ct);
-
-		try {
-			await _publishEndpoint.Publish(new HandleReportRequestMessage(entity.Id));
-		}
-		catch {
-			await trans.RollbackAsync(ct);
-			throw;
-		}
-
-		await trans.CommitAsync(ct);
+		Log.Information("Report request {Id} saved SUCCESS", entity.Id);
+		await _publishEndpoint.Publish(new HandleReportRequestMessage(entity.Id));
 		return _mapper.Map<ReportRequestDto>(entity);
 	}
 }

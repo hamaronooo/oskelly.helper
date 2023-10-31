@@ -21,6 +21,7 @@ public sealed class Endpoint : Endpoint<Request,ReportRequestDto>
 		Post("report");
 		AllowFormData();
 		AllowFileUploads();
+		ResponseCache(-1);
 		Summary(s => {
 			s.Summary = "Запрос на отчет";
 			s.Description = "Необходимо прикрепить файл с CVE; Excel или CSV (';' - delimiter), где колонки соответсвуют:<br/>" +
@@ -33,6 +34,7 @@ public sealed class Endpoint : Endpoint<Request,ReportRequestDto>
 
 	public override async Task HandleAsync(Request req, CancellationToken ct)
 	{
+		Log.Information("New report requst incoming");
 		ThrowIfAnyErrors();
 		if (Files.Count == 0) ThrowError("Нет прикрепленных файлов", 400);
 		if (Files.Count > 1) ThrowError("Можно прикрепить только один файл", 400);
@@ -43,12 +45,15 @@ public sealed class Endpoint : Endpoint<Request,ReportRequestDto>
 			// ".csv" =>  _requestParser.ParseCsvReportRequestCve(fileStream),
 			_ => Enumerable.Empty<ReportRequestVulnerabilityPointDto>().ToList()
 		};
+		if (cveList.Count == 0) ThrowError("Сервис не смог найти ни одного CVE для загрузки", 400);
+		Log.Information("Parsed {Count} CVE for load", cveList.Count);
 		var command = new ReportRequestExtendedDto() {
 			CustomName = req.CustomName,
 			SearchStrategy = req.SearchStrategy,
 			SourcesRaw = req.ReduceSources(),
 			Vulnerabilities = cveList
 		};
+		Log.Information("Request Sources: {Sources}", command.SourcesRaw);
 		var response = await _mediator.Send(new CreateReportCommand(command), ct);
 		await SendOkAsync(response, ct);
 	}
