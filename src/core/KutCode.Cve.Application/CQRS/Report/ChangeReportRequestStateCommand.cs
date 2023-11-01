@@ -1,10 +1,10 @@
 ﻿using KutCode.Cve.Application.Database;
-using KutCode.Cve.Domain.Enums;
+using KutCode.Cve.Domain.Dto.Websockets;
 using Microsoft.EntityFrameworkCore;
 
 namespace KutCode.Cve.Application.CQRS.Report;
 
-public sealed record ChangeReportRequestStateCommand(Guid ReportRequestId, ReportRequestState NewState) : IRequest;
+public sealed record ChangeReportRequestStateCommand(ReportRequestStateUpdateDto Message) : IRequest;
 public class ChangeReportRequestStateCommandHandler : IRequestHandler<ChangeReportRequestStateCommand>
 {
 	private readonly MainDbContext _context;
@@ -18,8 +18,9 @@ public class ChangeReportRequestStateCommandHandler : IRequestHandler<ChangeRepo
 	public async Task Handle(ChangeReportRequestStateCommand requestState, CancellationToken ct)
 	{
 		await _context.ReportRequests
-			.Where(x => x.Id == requestState.ReportRequestId)
-			.ExecuteUpdateAsync(calls => calls.SetProperty(p => p.State, requestState.NewState));
-		await _websocket.SendReportStateAsync(requestState.ReportRequestId, requestState.NewState, ct);
+			.Where(x => x.Id == requestState.Message.ReportId)
+			.ExecuteUpdateAsync(calls 
+				=> calls.SetProperty(p => p.State, requestState.Message.State));
+		await _websocket.SendReportStateAsync(requestState.Message, ct);
 	}
 }

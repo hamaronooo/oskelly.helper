@@ -44,13 +44,14 @@ public sealed class HandleReportRequestCommandHandler: IRequestHandler<HandleRep
 			Log.Warning("{ClassName}; Load request with Id: {Id} not found", GetType().Name, request.RequestId);
 			return;
 		}
-		await _mediator.Send(new ChangeReportRequestStateCommand(rReq.Value!.Id, ReportRequestState.Handling), ct);
 		
+		await _mediator.Send(new ChangeReportRequestStateCommand(new (rReq.Value!.Id, ReportRequestState.Handling, 5)), ct);
 		try {
 			await Wrapper(rReq.Value!, ct);
 		}
 		catch {
-			await _mediator.Send(new ChangeReportRequestStateCommand(rReq.Value!.Id, ReportRequestState.Error), ct);
+			await _mediator.Send(new ChangeReportRequestStateCommand(
+				new (rReq.Value!.Id, ReportRequestState.Error)), ct);
 			throw;
 		}
 	}
@@ -61,9 +62,11 @@ public sealed class HandleReportRequestCommandHandler: IRequestHandler<HandleRep
 		List<VulnerabilityPointEntity> resolversResults = new();
 		Log.Information("{ClassName}; ReportSearchStrategy for request with Id: {Id} is {SearchStrategy}", 
 			GetType().Name, rReq.Id, rReq.SearchStrategyName);
+		
 		if (rReq.SearchStrategy == ReportSearchStrategy.Combine) {
-			resolversResults.AddRange(await GetResolvesResult(rReq!, ct));
-			resolversResults.AddRange(await GetDbResolves(rReq!, ct));
+			resolversResults.AddRange(await GetResolvesResult(rReq, ct));
+			await _mediator.Send(new ChangeReportRequestStateCommand(new (rReq.Id, ReportRequestState.Handling, 30)), ct);
+			resolversResults.AddRange(await GetDbResolves(rReq, ct));
 		}
 		if (rReq.SearchStrategy == ReportSearchStrategy.OnlyNew)
 			resolversResults.AddRange(await GetResolvesResult(rReq!, ct));
@@ -82,6 +85,7 @@ public sealed class HandleReportRequestCommandHandler: IRequestHandler<HandleRep
 					RequestedVulnerability = req, LoadedResolves = res
 				});
 
+		await _mediator.Send(new ChangeReportRequestStateCommand(new (rReq.Id, ReportRequestState.Handling, 60)), ct);
 		// find solutions 
 		var parallelOptions = new ParallelOptions { CancellationToken = ct, MaxDegreeOfParallelism = 20 };
 		var foundSolutions = new ConcurrentBag<SolutionFinderResult<VulnerabilityPointEntity>>();
@@ -98,12 +102,13 @@ public sealed class HandleReportRequestCommandHandler: IRequestHandler<HandleRep
 		Log.Information("{ClassName}; Found {Count} solutions for report request: {Id}", 
 			GetType().Name, foundSolutions.Count, rReq.Id);
 		
+		await _mediator.Send(new ChangeReportRequestStateCommand(new (rReq.Id, ReportRequestState.Handling, 80)), ct);
 		// create and save report 
 		var reportBytes = await _reportCreator.CreateExcelReportAsync(rReq, foundSolutions, ct);
 		await _fileService.SaveFileAsync(reportBytes, rReq.Id, ct);
 		
 		Log.Information("{ClassName}; Report with Id: {Id}, saved SUCCESSFULLY", GetType().Name, rReq.Id);
-		await _mediator.Send(new ChangeReportRequestStateCommand(rReq.Id, ReportRequestState.Success), ct);
+		await _mediator.Send(new ChangeReportRequestStateCommand(new (rReq.Id, ReportRequestState.Success, 100)), ct);
 	}
 
 	#region Help methods
