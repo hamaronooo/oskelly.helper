@@ -9,6 +9,6 @@ public enum ReportSearchStrategy
 	OnlyNew = 10,
 	[Description("Поиск только по сохраненным результатам")]
 	OnlyStorage = 20,
-	[Description("Поиск во всех источниках")]
+	[Description("Искать везде")]
 	Combine = 30
 }

@@ -16,26 +16,31 @@ public sealed class CveReportCreator : ICveReportCreator
         CancellationToken ct = default)
     {
         ExcelPackage package = new ();
-        var successSheet = package.Workbook.Worksheets.Add("Успешно найдено");
-        successSheet.TabColor = Color.LimeGreen;
-        var errorSheet = package.Workbook.Worksheets.Add("Не найдено");
-        errorSheet.TabColor = Color.Red;
-
-        var vuls = vulnerabilities.ToList();
+        
+        var vList = vulnerabilities.ToList();
         List<(ReportRequestVulnerabilityPointDto Requested, SolutionFinderResult<VulnerabilityPointEntity> Resolves)> founds = new();
         List<ReportRequestVulnerabilityPointDto> notFounds = new();
         
         foreach (var reqVul in reportRequest.Vulnerabilities.OrderByDescending(x => x.CveId))
         {
-            SolutionFinderResult<VulnerabilityPointEntity>? reqVulResolves = vuls.Where(x =>
+            SolutionFinderResult<VulnerabilityPointEntity>? reqVulResolves = vList.Where(x =>
                     x.Best.HasValue && x.Best.Value!.CveId == reqVul.CveId)
                 .FirstOrDefault();
             if (reqVulResolves is null)
                 notFounds.Add(reqVul);
             else founds.Add((reqVul, reqVulResolves));
         }
-        FillSuccess(successSheet, founds);
-        FillError(errorSheet, notFounds);
+
+        if (founds.Count > 0) {
+            var successSheet = package.Workbook.Worksheets.Add("Успешно найдено");
+            successSheet.TabColor = Color.LimeGreen;
+            FillSuccess(successSheet, founds);
+        }
+        if (notFounds.Count > 0) {
+            var errorSheet = package.Workbook.Worksheets.Add("Не найдено");
+            errorSheet.TabColor = Color.Red;
+            FillError(errorSheet, notFounds);
+        }
         return await package.GetAsByteArrayAsync(ct);
     }
 
@@ -56,10 +61,10 @@ public sealed class CveReportCreator : ICveReportCreator
         sheet.Cells[row, 10].Value = "Additional Link";
         foreach (var found in founds)
         {
-            row++;
             var best = found.Resolves.Best.Value!;
             foreach (var solution in best.CveSolutions)
             {
+                row++;
                 sheet.Cells[row, 1].Value = best.CveId.AsString;
                 sheet.Cells[row, 2].Value = found.Requested.Software;
                 sheet.Cells[row, 3].Value = found.Requested.Platform;
