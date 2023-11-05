@@ -21,7 +21,6 @@ public sealed class Endpoint : Endpoint<Request,ReportRequestDto>
 		Post("report");
 		AllowFormData();
 		AllowFileUploads();
-		ResponseCache(-1);
 		Summary(s => {
 			s.Summary = "Запрос на отчет";
 			s.Description = "Необходимо прикрепить файл с CVE; Excel или CSV (';' - delimiter), где колонки соответсвуют:<br/>" +
@@ -34,7 +33,7 @@ public sealed class Endpoint : Endpoint<Request,ReportRequestDto>
 
 	public override async Task HandleAsync(Request req, CancellationToken ct)
 	{
-		Log.Information("New report requst incoming");
+		Log.Information("New report request incoming");
 		ThrowIfAnyErrors();
 		if (Files.Count == 0) ThrowError("Нет прикрепленных файлов", 400);
 		if (Files.Count > 1) ThrowError("Можно прикрепить только один файл", 400);

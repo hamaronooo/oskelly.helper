@@ -51,7 +51,7 @@ app.UseFastEndpoints(c => {
 	c.Endpoints.RoutePrefix = "api";
 	c.Versioning.Prefix = "v";
 	c.Versioning.PrependToRoute = true;
-	c.Serializer.Options.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+	//c.Serializer.Options.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
 });
 app.UseSignalR();
 app.UseSwaggerGen();
