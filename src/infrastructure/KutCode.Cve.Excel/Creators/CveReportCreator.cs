@@ -20,8 +20,13 @@ public sealed class CveReportCreator : ICveReportCreator
         var vList = vulnerabilities.ToList();
         List<(ReportRequestVulnerabilityPointDto Requested, SolutionFinderResult<VulnerabilityPointEntity> Resolves)> founds = new();
         List<ReportRequestVulnerabilityPointDto> notFounds = new();
+
+        // sort or not sort 
+        var vuls = reportRequest.IsReorder
+            ? reportRequest.Vulnerabilities.OrderByDescending(x => x.CveId).ToList()
+            : reportRequest.Vulnerabilities;
         
-        foreach (var reqVul in reportRequest.Vulnerabilities.OrderByDescending(x => x.CveId))
+        foreach (var reqVul in vuls)
         {
             SolutionFinderResult<VulnerabilityPointEntity>? reqVulResolves = vList.Where(x =>
                     x.Best.HasValue && x.Best.Value!.CveId == reqVul.CveId)

@@ -14,6 +14,10 @@ public record ReportRequestDto
 	public string SearchStrategyName => EnumHelper.GetDescriptionValue(SearchStrategy);
 	public DateTime? SysCreated { get;init; }
 	/// <summary>
+	/// Сортировать вывод по CVE ID
+	/// </summary>
+	public bool IsReorder { get; set; } = false;
+	/// <summary>
 	/// Resolver Code через разделитель ';'
 	/// </summary>
 	public string SourcesRaw { get;init; }

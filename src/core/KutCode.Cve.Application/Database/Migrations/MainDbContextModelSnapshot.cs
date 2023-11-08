@@ -160,6 +160,10 @@ namespace KutCode.Cve.Application.Database.Migrations
                         .HasColumnType("text")
                         .HasColumnName("custom_name");
 
+                    b.Property<bool>("IsReorder")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_reorder");
+
                     b.Property<int>("SearchStrategy")
                         .HasColumnType("integer")
                         .HasColumnName("search_strategy");
@@ -313,11 +317,11 @@ namespace KutCode.Cve.Application.Database.Migrations
             modelBuilder.Entity("KutCode.Cve.Domain.Entities.VulnerabilityPointEntity", b =>
                 {
                     b.HasOne("KutCode.Cve.Domain.Entities.PlatformEntity", "Platform")
-                        .WithMany("Vulnerabilities")
+                        .WithMany("VulnerabilityPoints")
                         .HasForeignKey("PlatformId");
 
                     b.HasOne("KutCode.Cve.Domain.Entities.SoftwareEntity", "Software")
-                        .WithMany("Vulnerabilities")
+                        .WithMany("VulnerabilityPoints")
                         .HasForeignKey("SoftwareId");
 
                     b.HasOne("KutCode.Cve.Domain.Entities.CveEntity", "Cve")
@@ -340,7 +344,7 @@ namespace KutCode.Cve.Application.Database.Migrations
 
             modelBuilder.Entity("KutCode.Cve.Domain.Entities.PlatformEntity", b =>
                 {
-                    b.Navigation("Vulnerabilities");
+                    b.Navigation("VulnerabilityPoints");
                 });
 
             modelBuilder.Entity("KutCode.Cve.Domain.Entities.Report.ReportRequestEntity", b =>
@@ -350,7 +354,7 @@ namespace KutCode.Cve.Application.Database.Migrations
 
             modelBuilder.Entity("KutCode.Cve.Domain.Entities.SoftwareEntity", b =>
                 {
-                    b.Navigation("Vulnerabilities");
+                    b.Navigation("VulnerabilityPoints");
                 });
 
             modelBuilder.Entity("KutCode.Cve.Domain.Entities.VulnerabilityPointEntity", b =>
