@@ -50,7 +50,8 @@ public sealed class Endpoint : Endpoint<Request,ReportRequestDto>
 			CustomName = req.CustomName,
 			SearchStrategy = req.SearchStrategy,
 			SourcesRaw = req.ReduceSources(),
-			Vulnerabilities = cveList
+			Vulnerabilities = cveList,
+			IsReorder = req.IsReorder
 		};
 		Log.Information("Request Sources: {Sources}", command.SourcesRaw);
 		var response = await _mediator.Send(new CreateReportCommand(command), ct);
