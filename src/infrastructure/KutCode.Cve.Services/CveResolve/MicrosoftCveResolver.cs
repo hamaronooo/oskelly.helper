@@ -5,6 +5,7 @@ using KutCode.Cve.Services.ApiRepositories.Microsoft.Models;
 
 namespace KutCode.Cve.Services.CveResolve;
 
+[CveResolver("msrc", "Основной репозиторий Microsoft (msrc)", "api.msrc.microsoft.com")]
 public sealed class MicrosoftCveResolver : ICveResolver
 {
 	private readonly MicrosoftSecurityApiRepository _msrcApi;

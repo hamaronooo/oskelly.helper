@@ -9,6 +9,7 @@ namespace KutCode.Cve.Services.CveResolve;
 /// <summary>
 /// Resolve CVE from MSRC site from old Microsoft vulnerability system (non CVE)
 /// </summary>
+[CveResolver("msrc_old", "Устаревший репозиторий Microsoft (до 2018)", "api.msrc.microsoft.com", false)]
 public sealed class MicrosoftOldCveResolver : ICveResolver
 {
 	private readonly MicrosoftSecurityApiRepository _msrcApi;

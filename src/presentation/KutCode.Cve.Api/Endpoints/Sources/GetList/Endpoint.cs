@@ -1,9 +1,9 @@
-﻿
+﻿using System.Reflection;
 using KutCode.Cve.Application.Interfaces.Cve;
 
 namespace KutCode.Cve.Api.Endpoints.Sources.GetList;
 
-public sealed class Endpoint : EndpointWithoutRequest<IEnumerable<Response>>
+public sealed class Endpoint : EndpointWithoutRequest<IEnumerable<CveResolverListItem>>
 {
 	public override void Configure()
 	{
@@ -18,9 +18,13 @@ public sealed class Endpoint : EndpointWithoutRequest<IEnumerable<Response>>
 		var types = AppDomain.CurrentDomain.GetAssemblies()
 			.SelectMany(s => s.GetTypes())
 			.Where(p => type.IsAssignableFrom(p));
+		List<CveResolverListItem> result = new();
 		foreach (var t in types) {
-			var a = t.GetProperty("Code").GetConstantValue();
+			Attribute? attributeRaw = t.GetCustomAttribute(typeof(CveResolverAttribute));
+			if (attributeRaw is null) continue;
+			var attribute = (CveResolverAttribute) attributeRaw;
+			result.Add(new (attribute.Code, attribute.Name, attribute.Domain, attribute.Enabled));
 		}
-		await SendOkAsync(new []{}, ct);
+		await SendOkAsync(result, ct);
 	}
 }
