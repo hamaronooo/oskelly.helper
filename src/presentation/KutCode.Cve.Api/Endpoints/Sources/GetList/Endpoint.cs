@@ -5,6 +5,7 @@ namespace KutCode.Cve.Api.Endpoints.Sources.GetList;
 
 public sealed class Endpoint : EndpointWithoutRequest<IEnumerable<CveResolverListItem>>
 {
+	public ICveResolverManager ResolverManager { get; set; }
 	public override void Configure()
 	{
 		Version(1);
