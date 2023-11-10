@@ -150,8 +150,8 @@ public sealed class HandleReportRequestCommandHandler: IRequestHandler<HandleRep
 						result.CveYear = dto.CveYear;
 						result.CveCnaNumber = dto.CveCnaNumber;
 						result.Description = dto.CveDescription;
-						result.Platform ??= new PlatformEntity() { Name = dto.Platform ?? string.Empty };
-						result.Software ??= new SoftwareEntity() { Name = dto.Software ?? string.Empty };
+						result.Platform ??= new PlatformEntity() { Name = string.Empty };
+						result.Software ??= new SoftwareEntity() { Name = string.Empty };
 						bag.Add(result);
 					}
 				}

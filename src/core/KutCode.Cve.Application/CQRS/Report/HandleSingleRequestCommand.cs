@@ -78,14 +78,14 @@ public class HandleSingleRequestCommandHandler : IRequestHandler<HandleSingleReq
 		await Parallel.ForEachAsync(rReq.Vulnerabilities, parallelOptions, async (dto, token) => {
 			foreach (var resolver in resolvers) {
 				try {
-					var resolveResult = await resolver.ResolveAsync(new CveId(dto.CveYear, dto.CveCnaNumber), token);
-					foreach (var result in resolveResult)
+					var resolveResults = await resolver.ResolveAsync(new CveId(dto.CveYear, dto.CveCnaNumber), token);
+					foreach (var result in resolveResults)
 					{
 						result.CveYear = dto.CveYear;
 						result.CveCnaNumber = dto.CveCnaNumber;
 						result.Description = dto.CveDescription;
-						result.Platform ??= new PlatformEntity() { Name = dto.Platform ?? string.Empty };
-						result.Software ??= new SoftwareEntity() { Name = dto.Software ?? string.Empty };
+						result.Platform ??= new PlatformEntity() { Name = string.Empty };
+						result.Software ??= new SoftwareEntity() { Name = string.Empty };
 						bag.Add(result);
 					}
 				}

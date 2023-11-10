@@ -33,6 +33,7 @@ public sealed class CveSolutionFinder : ICveSolutionFinder
 			platformIndex.DefaultTokenizer);
 		var platformQueryDto = GetQuery(NamesNormalizer.NormalizeSoftwareName(vulnerabilityPoint.Platform),
 			platformIndex.DefaultTokenizer);
+
 		if (softwareQueryDto.IsPromptValid)
 		{
 			var platformResult = platformIndex.Search(softwareQueryDto.Query);
@@ -40,7 +41,6 @@ public sealed class CveSolutionFinder : ICveSolutionFinder
 			var softwareResult = softwareIndex.Search(softwareQueryDto.Query);
 			results.AddRange(softwareResult.Select(x => (x.Key, x.Score)));
 		}
-
 		if (platformQueryDto.IsPromptValid)
 		{
 			var platformResult = platformIndex.Search(platformQueryDto.Query);
@@ -49,11 +49,11 @@ public sealed class CveSolutionFinder : ICveSolutionFinder
 			results.AddRange(softwareResult.Select(x => (x.Key, x.Score)));
 		}
 
-		var result = results.GroupBy(x => x.Id)
+		var result = results
+			.GroupBy(x => x.Id)
 			.Select(x => new { x.Key, Total = x.Count() * x.Sum(s => s.Score) })
 			.Join(resolvesList, arg => arg.Key, entity => entity.Id,
-				(searchResult, entity) =>
-				{
+				(searchResult, entity) => {
 					return new SolutionFinderResultItem<VulnerabilityPointEntity>(vulnerabilityPoint.CveId,  entity, searchResult.Total);
 				});
 		return new SolutionFinderResult<VulnerabilityPointEntity>(result);
