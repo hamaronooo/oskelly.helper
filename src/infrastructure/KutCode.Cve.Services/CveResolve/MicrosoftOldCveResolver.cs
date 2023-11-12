@@ -77,6 +77,18 @@ public sealed class MicrosoftOldCveResolver : ICveResolver
 			if (tableBody is not null)
 				resolves.AddRange(ParseTable(refUri, cveId, mitre, tableBody, tableHeaders));
 		}
+		// Windows Operating System and Components table
+		{
+			var tableHeaders = document.DocumentNode
+				.SelectSingleNode("//p/strong[text() = 'Windows Operating System and Components']/following::table[1]/thead/tr")
+				.ChildNodes.Where(x => x.Name == "th").Select(x => x.InnerText).ToArray();
+			var tableBody =
+				document.DocumentNode.SelectSingleNode(
+					"//p/strong[text() = 'Windows Operating System and Components']/following::table[1]/tbody");
+
+			if (tableBody is not null)
+				resolves.AddRange(ParseTable(refUri, cveId, mitre, tableBody, tableHeaders));
+		}
 
 		return resolves;
 	}

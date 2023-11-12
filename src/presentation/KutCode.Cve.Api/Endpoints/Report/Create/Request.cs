@@ -19,7 +19,7 @@ public sealed class Request
 	/// </summary>
 	public List<string> Sources { get; set; }
 
-	public string ReduceSources() => string.Join(';', Sources);
+	public string ReduceSources() => string.Join(',', Sources);
 
 	public IFormFile File { get; set; }
 }
