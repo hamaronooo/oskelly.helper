@@ -18,8 +18,8 @@ public record ReportRequestDto
 	/// </summary>
 	public bool IsReorder { get; set; } = false;
 	/// <summary>
-	/// Resolver Code через разделитель ';'
+	/// Resolver Code через разделитель ','
 	/// </summary>
 	public string SourcesRaw { get;init; }
-	public string[] Sources => SourcesRaw.Split(';');
+	public string[] Sources => SourcesRaw.Split(',');
 }

@@ -132,7 +132,6 @@ public sealed class HandleReportRequestCommandHandler: IRequestHandler<HandleRep
 		return result;
 	}
 
-
 	private async Task<List<VulnerabilityPointEntity>> GetResolvesResult(ReportRequestExtendedDto rReq, CancellationToken ct)
 	{
 		List<ICveResolver> resolvers = new(rReq.Sources.Length);
