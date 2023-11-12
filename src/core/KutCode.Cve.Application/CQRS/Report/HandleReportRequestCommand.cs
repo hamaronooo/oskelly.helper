@@ -90,8 +90,10 @@ public sealed class HandleReportRequestCommandHandler: IRequestHandler<HandleRep
 		var parallelOptions = new ParallelOptions { CancellationToken = ct, MaxDegreeOfParallelism = 20 };
 		var foundSolutions = new ConcurrentBag<SolutionFinderResult<VulnerabilityPointEntity>>();
 		await Parallel.ForEachAsync(solutionSearchSet, parallelOptions, async (dto, token) => {
-			try {
-				SolutionFinderResult<VulnerabilityPointEntity> solutions = await _solutionFinder.FindAsync(dto.RequestedVulnerability, dto.LoadedResolves, token);
+			try
+			{
+				SolutionFinderResult<VulnerabilityPointEntity> solutions =
+					await _solutionFinder.FindAsync(dto.RequestedVulnerability, dto.LoadedResolves, ct: token);
 				foundSolutions.Add(solutions);
 			}
 			catch {

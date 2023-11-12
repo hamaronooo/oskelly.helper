@@ -6,19 +6,33 @@ namespace KutCode.Cve.Services.ApiRepositories.Mitre.Models;
 public sealed class MitreCveModel
 {
 	[JsonProperty("containers")]
-	public ContainersMitreCveModel Containers { get; set; }
+	public MitreCveContainer Containers { get; set; }
 }
-public class ContainersMitreCveModel
+public class MitreCveContainer
 {
 	[JsonProperty("cna")]
-	public CnaMitreCveModel Cna { get; set; }
+	public MitreCveCna Cna { get; set; }
 }
-public class CnaMitreCveModel
+
+public class MitreCveCna
 {
+	[JsonProperty("descriptions")]
+	public List<MitreCveDescription> Descriptions { get; set; }
+
 	[JsonProperty("references")]
-	public List<ReferenceMitreCveModel> References { get; set; }
+	public List<MitreCveReference> References { get; set; }
 }
-public sealed class ReferenceMitreCveModel
+
+public class MitreCveDescription
+{
+	[JsonProperty("lang")]
+	public string Lang { get; set; }
+
+	[JsonProperty("value")]
+	public string Value { get; set; }
+}
+
+public class MitreCveReference
 {
 	[JsonProperty("name")]
 	public string Name { get; set; }

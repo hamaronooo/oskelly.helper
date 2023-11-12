@@ -18,10 +18,18 @@ public sealed class CveSolutionFinder : ICveSolutionFinder
 	public async Task<SolutionFinderResult<VulnerabilityPointEntity>> FindAsync(
 		ReportRequestVulnerabilityPointDto vulnerabilityPoint,
 		IEnumerable<VulnerabilityPointEntity> foundedResolves,
+		CveSolutionFinderSettings? settings = null,
 		CancellationToken ct = default)
 	{
+		settings ??= new();
 		if (string.IsNullOrEmpty(vulnerabilityPoint.Software) && string.IsNullOrEmpty(vulnerabilityPoint.Platform))
-			return new SolutionFinderResult<VulnerabilityPointEntity>();
+		{
+			if (settings.ShowResultsIfEmptyPrompt is false)
+				return new SolutionFinderResult<VulnerabilityPointEntity>();
+			else return GetDefault(vulnerabilityPoint, foundedResolves);
+		}
+		
+		
 		var resolvesList = foundedResolves?.ToList();
 		if (resolvesList is null || resolvesList.Count() == 0)
 			return new SolutionFinderResult<VulnerabilityPointEntity>();
@@ -54,9 +62,18 @@ public sealed class CveSolutionFinder : ICveSolutionFinder
 			.Select(x => new { x.Key, Total = x.Count() * x.Sum(s => s.Score) })
 			.Join(resolvesList, arg => arg.Key, entity => entity.Id,
 				(searchResult, entity) => {
-					return new SolutionFinderResultItem<VulnerabilityPointEntity>(vulnerabilityPoint.CveId,  entity, searchResult.Total);
+					return new SolutionFinderResultItem<VulnerabilityPointEntity>(vulnerabilityPoint.CveId, entity, searchResult.Total);
 				});
 		return new SolutionFinderResult<VulnerabilityPointEntity>(result);
+	}
+
+	private SolutionFinderResult<VulnerabilityPointEntity> GetDefault(ReportRequestVulnerabilityPointDto vulnerabilityPoint, IEnumerable<VulnerabilityPointEntity> foundedResolves)
+	{
+		return new SolutionFinderResult<VulnerabilityPointEntity>
+		{
+			Resolves = foundedResolves.Select(x =>
+				new SolutionFinderResultItem<VulnerabilityPointEntity>(vulnerabilityPoint.CveId, x, 0)).ToList()
+		};
 	}
 
 	private (string Query, bool IsPromptValid) GetQuery(string prompt, IIndexTokenizer tokenizer)

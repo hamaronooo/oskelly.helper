@@ -12,5 +12,12 @@ public interface ICveSolutionFinder
 	Task<SolutionFinderResult<VulnerabilityPointEntity>> FindAsync(
 		ReportRequestVulnerabilityPointDto vulnerabilityPoint,
 		IEnumerable<VulnerabilityPointEntity> foundedResolves,
-		CancellationToken ct = default);
+		CveSolutionFinderSettings? settings = null,
+		CancellationToken ct = default
+		);
+}
+
+public sealed class CveSolutionFinderSettings
+{
+	public bool ShowResultsIfEmptyPrompt = false;
 }

@@ -3,6 +3,7 @@ using KutCode.Cve.Application.Interfaces.Cve;
 using KutCode.Cve.Domain;
 using KutCode.Cve.Services.ApiRepositories.Microsoft;
 using KutCode.Cve.Services.ApiRepositories.Mitre;
+using KutCode.Cve.Services.ApiRepositories.Mitre.Models;
 
 namespace KutCode.Cve.Services.CveResolve;
 
@@ -38,24 +39,27 @@ public sealed class MicrosoftOldCveResolver : ICveResolver
 			if (refUri.Host == "learn.microsoft.com" || refUri.Host == "docs.microsoft.com") {
 				// goto link, download xml page and try parse it
 				// try get Affected Software block table
-				var results = await LoadAsync(refUri);
+				var results = await LoadAsync(refUri, cveId, mitreCve.Data);
 				result.AddRange(results);
 			}
 		}
 		return result;
 	}
 
-	private async Task<IEnumerable<VulnerabilityPointEntity>> LoadAsync(Uri refUri)
+	private async Task<IEnumerable<VulnerabilityPointEntity>> LoadAsync(Uri refUri, CveId cveId, MitreCveModel mitre)
 	{
 		HtmlWeb web = new();
 		HtmlDocument document = await web.LoadFromWebAsync(refUri.AbsoluteUri);
-		var table = document.DocumentNode
-			.SelectSingleNode("//p/strong[text() = 'Affected Software']/following::table[1]/tbody");
+		var tableHeaders = document.DocumentNode
+			.SelectSingleNode("//p/strong[text() = 'Affected Software']/following::table[1]/thead/tr")
+			.ChildNodes.Where(x => x.Name == "th").Select(x => x.InnerText).ToArray();
+		var tableBody = document.DocumentNode.SelectSingleNode("//p/strong[text() = 'Affected Software']/following::table[1]/tbody");
 		
-		if (table is null) return Enumerable.Empty<VulnerabilityPointEntity>();
+		if (tableBody is null) return Enumerable.Empty<VulnerabilityPointEntity>();
 
 		List<VulnerabilityPointEntity> resolves = new();
-		foreach (var row in table.ChildNodes.Where(x => x.Name == "tr"))
+		var description = mitre.Containers.Cna.Descriptions.FirstOrDefault()?.Value;
+		foreach (var row in tableBody.ChildNodes.Where(x => x.Name == "tr"))
 		{
 			var cells = row.ChildNodes.Where(x => x.Name == "td").ToArray();
 			if (cells.Length < 4) continue;
@@ -71,20 +75,37 @@ public sealed class MicrosoftOldCveResolver : ICveResolver
 						resolve.Software = new SoftwareEntity { Name = resolve.Platform.Name };
 						break;
 					case 1:
-						resolve.Impact = ParseImpact(cells[i]);
+						resolve.Impact = ParseImpact(cells, tableHeaders);
 						break;
 					case 3:
-						resolve.CveSolutions = ParseResolves(cells[i], cells[0]).ToList();
+						var fallbackSearch = string.Join(' ', cells.Select(c => c.InnerText));
+						resolve.CveSolutions = ParseResolves(cells[i], fallbackSearch).Select(x => {
+							x.SolutionLink = refUri.AbsoluteUri;
+							return x;
+						}).ToList();
 						break;
 				}
 			}
 			if (string.IsNullOrEmpty(resolve.Platform?.Name) || resolve.CveSolutions.Count == 0) continue;
+			resolve.CveId = cveId;
+			resolve.DataSourceCode = this.Code;
+			resolve.Description = description;
 			resolves.Add(resolve);
 		}
 
 		return resolves;
 	}
-	
+
+	string ParseImpact(HtmlNode[] cells, string[] tableHeaders)
+	{
+		var header = tableHeaders.Select((x, index) => (x, index)).FirstOrDefault(t => t.x.ToLower().Contains("impact"));
+		if (cells.Length < header.index + 1)
+			return cells[1].InnerText.Normalize();
+		var link = cells[header.index].ChildNodes.FirstOrDefault(x => x.Name == "a");
+		if (link is not null) return link.InnerText;
+		return cells[header.index].InnerText;
+	}
+
 	PlatformEntity ParseProductName(HtmlNode cell)
 	{
 		var nameLink = cell.ChildNodes.FirstOrDefault(x => x.Name == "a");
@@ -94,15 +115,15 @@ public sealed class MicrosoftOldCveResolver : ICveResolver
 			Name = Regexes.KbRegex.Replace(cell.InnerText, string.Empty)
 		};
 	}
-	string ParseImpact(HtmlNode cell)
-	{
-		return cell.InnerText.Normalize();
-	}
-	IEnumerable<CveSolutionEntity> ParseResolves(HtmlNode cell, HtmlNode nameCell)
+
+	IEnumerable<CveSolutionEntity> ParseResolves(HtmlNode cell, string fallbackSearch)
 	{
 		var result = Regexes.KbRegex.Matches(cell.InnerText).Select(x => x.Value).ToList();
 		if (result.Count==0)
-			result = Regexes.KbRegex.Matches(nameCell.InnerText).Select(x => x.Value).ToList();
+			result = Regexes.KbRegex.Matches(fallbackSearch)
+				.Select(x => x.Value)
+				.Distinct()
+				.ToList();
 		return result.Select(x => new CveSolutionEntity {
 			Info = x
 		});

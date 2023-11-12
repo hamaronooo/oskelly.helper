@@ -42,7 +42,7 @@ public class HandleSingleRequestCommandHandler : IRequestHandler<HandleSingleReq
 		if (rReq.SearchStrategy == ReportSearchStrategy.OnlyStorage)
 			resolversResults.AddRange(await GetDbResolves(rReq!, ct));
 		
-		return await _solutionFinder.FindAsync(rReq.Vulnerabilities.Single(), resolversResults, ct);
+		return await _solutionFinder.FindAsync(rReq.Vulnerabilities.Single(), resolversResults, new () { ShowResultsIfEmptyPrompt = true }, ct);
 	}
 	
 	#region Help methods
@@ -83,7 +83,7 @@ public class HandleSingleRequestCommandHandler : IRequestHandler<HandleSingleReq
 					{
 						result.CveYear = dto.CveYear;
 						result.CveCnaNumber = dto.CveCnaNumber;
-						result.Description = dto.CveDescription;
+						result.Description = dto.CveDescription ?? result.Description;
 						result.Platform ??= new PlatformEntity() { Name = string.Empty };
 						result.Software ??= new SoftwareEntity() { Name = string.Empty };
 						bag.Add(result);

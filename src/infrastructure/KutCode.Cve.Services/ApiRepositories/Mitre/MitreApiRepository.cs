@@ -7,7 +7,7 @@ namespace KutCode.Cve.Services.ApiRepositories.Mitre;
 
 public sealed class MitreApiRepository
 {
-	private const string BaseUrl = "https://cve.org";
+	private const string BaseUrl = "https://cveawg.mitre.org";
 	private const string LoadCveXmlUrlTemplate = "https://cve.mitre.org/data/downloads/allitems-cvrf-year-{year}.xml";
 	
 	private readonly RestClient _client;
@@ -31,8 +31,7 @@ public sealed class MitreApiRepository
 	/// </summary>
 	public async Task<RestResponse<MitreCveModel>> GetCveAsync(CveId cveId, CancellationToken ct = default)
 	{
-		var request = new RestRequest($"{BaseUrl}/CVERecord", Method.Get);
-		request.AddQueryParameter("id", cveId.AsString);
+		var request = new RestRequest($"{BaseUrl}/api/cve/{cveId.ToString()}", Method.Get);
 		return await _client.ExecuteGetAsync<MitreCveModel>(request, ct);
 	}
 }

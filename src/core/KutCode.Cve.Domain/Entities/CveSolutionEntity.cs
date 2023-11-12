@@ -13,22 +13,22 @@ public sealed class CveSolutionEntity : ModelWithId<Guid>
 	public CveSolutionEntity(Guid uid) : base(uid) { }
 	
 	[Column("info")]
-	public string Info { get; init; }
+	public string Info { get; set; }
 	
 	/// <summary>
 	/// Text description of solution
 	/// </summary>
 	[Column("description")]
-	public string? Description { get; init; }
+	public string? Description { get; set; }
 
 	[Column("solution_link")]
-	public string? SolutionLink { get; init; }
+	public string? SolutionLink { get; set; }
 	
 	[Column("download_link")]
-	public string? DownloadLink { get; init; }
+	public string? DownloadLink { get; set; }
 	
 	[Column("additional_link")]
-	public string? AdditionalLink { get; init; }
+	public string? AdditionalLink { get; set; }
 
 	[Column("vulnerability_point_id")]
 	public Guid VulnerabilityPointId { get; set; }
