@@ -90,8 +90,10 @@ public sealed class HandleReportRequestCommandHandler: IRequestHandler<HandleRep
 		var parallelOptions = new ParallelOptions { CancellationToken = ct, MaxDegreeOfParallelism = 20 };
 		var foundSolutions = new ConcurrentBag<SolutionFinderResult<VulnerabilityPointEntity>>();
 		await Parallel.ForEachAsync(solutionSearchSet, parallelOptions, async (dto, token) => {
-			try {
-				SolutionFinderResult<VulnerabilityPointEntity> solutions = await _solutionFinder.FindAsync(dto.RequestedVulnerability, dto.LoadedResolves, token);
+			try
+			{
+				SolutionFinderResult<VulnerabilityPointEntity> solutions =
+					await _solutionFinder.FindAsync(dto.RequestedVulnerability, dto.LoadedResolves, ct: token);
 				foundSolutions.Add(solutions);
 			}
 			catch {
@@ -130,7 +132,6 @@ public sealed class HandleReportRequestCommandHandler: IRequestHandler<HandleRep
 		return result;
 	}
 
-
 	private async Task<List<VulnerabilityPointEntity>> GetResolvesResult(ReportRequestExtendedDto rReq, CancellationToken ct)
 	{
 		List<ICveResolver> resolvers = new(rReq.Sources.Length);
@@ -150,8 +151,8 @@ public sealed class HandleReportRequestCommandHandler: IRequestHandler<HandleRep
 						result.CveYear = dto.CveYear;
 						result.CveCnaNumber = dto.CveCnaNumber;
 						result.Description = dto.CveDescription;
-						result.Platform ??= new PlatformEntity() { Name = dto.Platform ?? string.Empty };
-						result.Software ??= new SoftwareEntity() { Name = dto.Software ?? string.Empty };
+						result.Platform ??= new PlatformEntity() { Name = string.Empty };
+						result.Software ??= new SoftwareEntity() { Name = string.Empty };
 						bag.Add(result);
 					}
 				}

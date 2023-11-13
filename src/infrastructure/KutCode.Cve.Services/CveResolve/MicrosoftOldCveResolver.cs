@@ -1,14 +1,16 @@
-﻿using KutCode.Cve.Application.Interfaces.Cve;
-using KutCode.Cve.Domain.Enums;
+﻿using HtmlAgilityPack;
+using KutCode.Cve.Application.Interfaces.Cve;
+using KutCode.Cve.Domain;
 using KutCode.Cve.Services.ApiRepositories.Microsoft;
-using KutCode.Cve.Services.ApiRepositories.Microsoft.Models;
 using KutCode.Cve.Services.ApiRepositories.Mitre;
+using KutCode.Cve.Services.ApiRepositories.Mitre.Models;
 
 namespace KutCode.Cve.Services.CveResolve;
 
 /// <summary>
 /// Resolve CVE from MSRC site from old Microsoft vulnerability system (non CVE)
 /// </summary>
+[CveResolver("msrc_old", "Устаревший репозиторий Microsoft (до 2018)", "learn.microsoft.com")]
 public sealed class MicrosoftOldCveResolver : ICveResolver
 {
 	private readonly MicrosoftSecurityApiRepository _msrcApi;
@@ -23,109 +25,160 @@ public sealed class MicrosoftOldCveResolver : ICveResolver
 	}
 
 	public string Code => "msrc_old";
-	public Uri Uri => new("https://api.msrc.microsoft.com/");
+	public Uri Uri => new("https://learn.microsoft.com/");
+
+	// todo: finish her
 	public async Task<IEnumerable<VulnerabilityPointEntity>> ResolveAsync(CveId cveId, CancellationToken ct = default)
 	{
-		var msResponse = await _msrcApi.GetCveDataAsync(cveId, ct);
-		if (msResponse.IsSuccessful is false)
-			throw new HttpRequestException(msResponse.Content, null, msResponse.StatusCode);
+		var mitreCve = await _mitreApi.GetCveAsync(cveId, ct);
+		if (mitreCve.Data == null || mitreCve.IsSuccessful == false) return Enumerable.Empty<VulnerabilityPointEntity>();
 
-		var result = new List<VulnerabilityPointEntity>(msResponse.Data?.Value.Count ?? 0);
-		foreach (var item in msResponse.Data?.Value ?? Enumerable.Empty<MicrosoftKbValueItem>())
-		{
-			if (CveId.Parse(item.CveNumber) != cveId) continue;
-			var solutions = GetSolutions(item);
-			if (solutions.Count == 0) continue;
-			var platform = GetPlatform(item);
-			var software = GetSoftware(item);
-			result.Add(new() {
-				CveYear = cveId.Year,
-				CveCnaNumber = cveId.CnaNumber,
-				DataSourceCode = Code,
-				Impact = item.Impact,
-				Platform = platform,
-				Software = software?.Name == platform?.Name ? null : software,
-				CveSolutions = solutions
-			});
+		var result = new List<VulnerabilityPointEntity>();
+		foreach (var reference in mitreCve.Data.Containers.Cna.References) {
+			Uri refUri = new(reference.Url);
+			if (refUri.Host == "learn.microsoft.com" || refUri.Host == "docs.microsoft.com") {
+				// goto link, download xml page and try parse it
+				// try get Affected Software block table
+				var results = await LoadAsync(refUri, cveId, mitreCve.Data);
+				result.AddRange(results);
+			}
 		}
-
 		return result;
 	}
 
-	private List<CveSolutionEntity> GetSolutions(MicrosoftKbValueItem item)
+	private async Task<IEnumerable<VulnerabilityPointEntity>> LoadAsync(Uri refUri, CveId cveId, MitreCveModel mitre)
 	{
-		if (item.KbArticles.Count == 0) return Enumerable.Empty<CveSolutionEntity>().ToList();
-		var result = new List<CveSolutionEntity>(item.KbArticles.Count);
-		foreach (var article in item.KbArticles)
+		HtmlWeb web = new();
+		HtmlDocument document = await web.LoadFromWebAsync(refUri.AbsoluteUri);
+
+		var resolves = new List<VulnerabilityPointEntity>();
+		
+		// main table
 		{
-			result.Add(new ()
+			var tableHeaders = document.DocumentNode
+				.SelectSingleNode("//p/strong[text() = 'Affected Software']/following::table[1]/thead/tr")
+				.ChildNodes.Where(x => x.Name == "th").Select(x => x.InnerText).ToArray();
+			var tableBody =
+				document.DocumentNode.SelectSingleNode(
+					"//p/strong[text() = 'Affected Software']/following::table[1]/tbody");
+
+			if (tableBody is not null)
+				resolves.AddRange(ParseTable(refUri, cveId, mitre, tableBody, tableHeaders));
+		}
+		// ms office table
+		{
+			var tableHeaders = document.DocumentNode
+				.SelectSingleNode("//p/strong[text() = 'Microsoft Office']/following::table[1]/thead/tr")
+				.ChildNodes.Where(x => x.Name == "th").Select(x => x.InnerText).ToArray();
+			var tableBody =
+				document.DocumentNode.SelectSingleNode(
+					"//p/strong[text() = 'Microsoft Office']/following::table[1]/tbody");
+
+			if (tableBody is not null)
+				resolves.AddRange(ParseTable(refUri, cveId, mitre, tableBody, tableHeaders));
+		}
+		// Windows Operating System and Components table
+		{
+			var tableHeaders = document.DocumentNode
+				.SelectSingleNode("//p/strong[text() = 'Windows Operating System and Components']/following::table[1]/thead/tr")
+				.ChildNodes.Where(x => x.Name == "th").Select(x => x.InnerText).ToArray();
+			var tableBody =
+				document.DocumentNode.SelectSingleNode(
+					"//p/strong[text() = 'Windows Operating System and Components']/following::table[1]/tbody");
+
+			if (tableBody is not null)
+				resolves.AddRange(ParseTable(refUri, cveId, mitre, tableBody, tableHeaders));
+		}
+
+		return resolves;
+	}
+
+	private List<VulnerabilityPointEntity> ParseTable(Uri refUri, CveId cveId, MitreCveModel mitre, HtmlNode tableBody, string[] tableHeaders)
+	{
+		List<VulnerabilityPointEntity> resolves = new();
+		var description = mitre.Containers.Cna.Descriptions.FirstOrDefault()?.Value;
+		foreach (var row in tableBody.ChildNodes.Where(x => x.Name == "tr"))
+		{
+			var cells = row.ChildNodes.Where(x => x.Name == "td").ToArray();
+			if (cells.Length < 4) continue;
+
+			VulnerabilityPointEntity resolve = new();
+
+			// solutions search
+			var fallbackSearch = string.Join(' ', cells.Select(c => c.InnerText));
+			resolve.CveSolutions = ParseResolves(cells, tableHeaders, fallbackSearch).Select(x =>
 			{
-				Info = $"KB{article.ArticleName}",
-				Description = string.IsNullOrEmpty(article.FixedBuildNumber)
-					? article.DownloadName :  $"Исправлено в сбоке {article.FixedBuildNumber}",
-				DownloadLink = article.DownloadUrl,
-				SolutionLink = article.ArticleUrl,
-				AdditionalLink = article.KnownIssuesUrl
-			});
+				x.SolutionLink = refUri.AbsoluteUri;
+				return x;
+			}).ToList();
+
+			if (resolve.CveSolutions.Count == 0) continue;
+
+			resolve.Platform = ParsePlatform(cells, tableHeaders);
+			resolve.Software = ParseSoftware(cells, tableHeaders);
+			resolve.Impact = ParseImpact(cells, tableHeaders);
+
+			resolve.CveId = cveId;
+			resolve.DataSourceCode = this.Code;
+			resolve.Description = description;
+			resolves.Add(resolve);
 		}
-		return result;
+
+		return resolves;
 	}
 
-	private PlatformEntity? GetPlatform(MicrosoftKbValueItem item)
+	SoftwareEntity? ParseSoftware(HtmlNode[] cells, string[] tableHeaders)
 	{
-		var platform = new PlatformEntity();
+		var res = SearchByHeaderPrompt(cells, tableHeaders, "component") 
+		          ?? SearchByHeaderPrompt(cells, tableHeaders, "software");
+		return string.IsNullOrEmpty(res) ? null : new () { Name = res };
+	}
+	PlatformEntity? ParsePlatform(HtmlNode[] cells, string[] tableHeaders)
+	{
+		var res = SearchByHeaderPrompt(cells, tableHeaders, "operating system") 
+		          ?? SearchByHeaderPrompt(cells, tableHeaders, "platform");
+		return string.IsNullOrEmpty(res) ? null : new () { Name = res };
+	}
 
-		if (string.IsNullOrEmpty(item.Platform))
-			return FindPlatformInProduct(item);
+	string ParseImpact(HtmlNode[] cells, string[] tableHeaders)
+	{
+		var header = tableHeaders.Select((x, index) => (x, index)).FirstOrDefault(t => t.x.ToLower().Contains("impact"));
+		if (cells.Length < header.index + 1)
+			return cells[1].InnerText.Normalize();
+		var link = cells[header.index].ChildNodes.FirstOrDefault(x => x.Name == "a");
+		if (link is not null) return link.InnerText;
+		return cells[header.index].InnerText;
+	}
+
+	IEnumerable<CveSolutionEntity> ParseResolves(HtmlNode[] cells, string[] tableHeaders, string fallbackSearch)
+	{
+		List<string> results = new();
+		var header = tableHeaders.Select((x, index) => (x, index)).FirstOrDefault(t => t.x.ToLower().Contains("updates replaced"));
+		if (cells.Length < header.index + 1)
+			return Regexes.KbRegex.Matches(fallbackSearch).Select(x => x.Value).Distinct()
+				.Select(x => new CveSolutionEntity {
+					Info = x
+				});
 		
-		if (item.Platform.ToLower().Contains("windows")) {
-			platform.PlatformType = PlatformType.Windows;
-		}
-		else if (item.Platform.ToLower().Contains("linux")
-		         || item.Platform.ToLower().Contains("ubuntu")
-		         || item.Platform.ToLower().Contains("debian")
-		         || item.Platform.ToLower().Contains("oracle")
-		         || item.Platform.ToLower().Contains("centos"))
-		{
-			platform.PlatformType = PlatformType.Linux;
-		}
-		else if (item.Platform.ToLower().Contains("mac os")
-		         || item.Platform.ToLower().Contains("ios")
-		         || item.Platform.ToLower().Contains("macos"))
-		{
-			platform.PlatformType = PlatformType.Apple;
-		}
-		platform.Name = item.Platform.Trim();
-		return platform;
-	}
-
-	private PlatformEntity? FindPlatformInProduct(MicrosoftKbValueItem item)
-	{
-		var platform = new PlatformEntity();
+		results = Regexes.KbRegex.Matches(cells[header.index].InnerText).Select(x => x.Value).ToList();
+		if (results.Count==0)
+			results = Regexes.KbRegex.Matches(fallbackSearch)
+				.Select(x => x.Value)
+				.Distinct()
+				.ToList();
 		
-		if (item.Product.ToLower().Contains("windows")) {
-			platform.PlatformType = PlatformType.Windows;
-		}
-		else if (item.Product.ToLower().Contains("linux")
-		         || item.Product.ToLower().Contains("ubuntu")
-		         || item.Product.ToLower().Contains("debian")
-		         || item.Product.ToLower().Contains("oracle")
-		         || item.Product.ToLower().Contains("centos"))
-		{
-			platform.PlatformType = PlatformType.Linux;
-		}
-		else if (item.Product.ToLower().Contains("mac os")
-		         || item.Product.ToLower().Contains("ios")
-		         || item.Product.ToLower().Contains("macos"))
-		{
-			platform.PlatformType = PlatformType.Apple;
-		}
-		platform.Name = item.Product.Trim();
-		return platform;
+		return results.Select(x => new CveSolutionEntity {
+			Info = x
+		});
 	}
 
-	private SoftwareEntity? GetSoftware(MicrosoftKbValueItem item)
+	private string? SearchByHeaderPrompt(HtmlNode[] cells, string[] tableHeaders, string headerPrompt)
 	{
-		return new SoftwareEntity {Name = item.Product.Trim()};
+		var header = tableHeaders.Select((x, index) => (x, index)).FirstOrDefault(t => t.x.ToLower().Contains(headerPrompt.ToLower()));
+		if (cells.Length < header.index + 1 || string.IsNullOrEmpty(header.x))
+			return null;
+		var link = cells[header.index].ChildNodes.FirstOrDefault(x => x.Name == "a");
+		if (link is not null) return link.InnerText;
+		return cells[header.index].InnerText;
 	}
 }

@@ -22,6 +22,12 @@ public sealed class ReportRequestEntity : ModelWithId<Guid>
 	public DateTime SysCreated { get; set; } = DateTime.Now;
 	
 	/// <summary>
+	/// Сортировать вывод по CVE ID
+	/// </summary>
+	[Column("is_reorder")]
+	public bool IsReorder { get; set; } = false;
+	
+	/// <summary>
 	/// Resolver Code через разделитель ';'
 	/// </summary>
 	[Column("sources")]

@@ -48,10 +48,10 @@ public sealed class Endpoint : Endpoint<Request, Response>
 		};
 		try {
 			var handleResult = await _mediator.Send(new HandleSingleRequestCommand(command), ct);
-			response.Solutions =  handleResult.Resolves.GroupBy(x => x.Resolve.DataSourceCode)
+			response.Solutions = handleResult.Resolves.GroupBy(x => x.Resolve.DataSourceCode)
 				.ToDictionary(
 					x => x.Key,
-					x => x.OrderBy(z => z.Score)
+					x => x.OrderByDescending(z => z.Score)
 						.Select(a => _mapper.Map<VulnerabilityPointDto>(a.Resolve))
 						.ToList()
 				);

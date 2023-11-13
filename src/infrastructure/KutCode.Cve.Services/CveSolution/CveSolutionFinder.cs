@@ -18,10 +18,18 @@ public sealed class CveSolutionFinder : ICveSolutionFinder
 	public async Task<SolutionFinderResult<VulnerabilityPointEntity>> FindAsync(
 		ReportRequestVulnerabilityPointDto vulnerabilityPoint,
 		IEnumerable<VulnerabilityPointEntity> foundedResolves,
+		CveSolutionFinderSettings? settings = null,
 		CancellationToken ct = default)
 	{
+		settings ??= new();
 		if (string.IsNullOrEmpty(vulnerabilityPoint.Software) && string.IsNullOrEmpty(vulnerabilityPoint.Platform))
-			return new SolutionFinderResult<VulnerabilityPointEntity>();
+		{
+			if (settings.ShowResultsIfEmptyPrompt is false)
+				return new SolutionFinderResult<VulnerabilityPointEntity>();
+			else return GetDefault(vulnerabilityPoint, foundedResolves);
+		}
+		
+		
 		var resolvesList = foundedResolves?.ToList();
 		if (resolvesList is null || resolvesList.Count() == 0)
 			return new SolutionFinderResult<VulnerabilityPointEntity>();
@@ -33,6 +41,7 @@ public sealed class CveSolutionFinder : ICveSolutionFinder
 			platformIndex.DefaultTokenizer);
 		var platformQueryDto = GetQuery(NamesNormalizer.NormalizeSoftwareName(vulnerabilityPoint.Platform),
 			platformIndex.DefaultTokenizer);
+
 		if (softwareQueryDto.IsPromptValid)
 		{
 			var platformResult = platformIndex.Search(softwareQueryDto.Query);
@@ -40,7 +49,6 @@ public sealed class CveSolutionFinder : ICveSolutionFinder
 			var softwareResult = softwareIndex.Search(softwareQueryDto.Query);
 			results.AddRange(softwareResult.Select(x => (x.Key, x.Score)));
 		}
-
 		if (platformQueryDto.IsPromptValid)
 		{
 			var platformResult = platformIndex.Search(platformQueryDto.Query);
@@ -49,14 +57,23 @@ public sealed class CveSolutionFinder : ICveSolutionFinder
 			results.AddRange(softwareResult.Select(x => (x.Key, x.Score)));
 		}
 
-		var result = results.GroupBy(x => x.Id)
+		var result = results
+			.GroupBy(x => x.Id)
 			.Select(x => new { x.Key, Total = x.Count() * x.Sum(s => s.Score) })
 			.Join(resolvesList, arg => arg.Key, entity => entity.Id,
-				(searchResult, entity) =>
-				{
-					return new SolutionFinderResultItem<VulnerabilityPointEntity>(vulnerabilityPoint.CveId,  entity, searchResult.Total);
+				(searchResult, entity) => {
+					return new SolutionFinderResultItem<VulnerabilityPointEntity>(vulnerabilityPoint.CveId, entity, searchResult.Total);
 				});
 		return new SolutionFinderResult<VulnerabilityPointEntity>(result);
+	}
+
+	private SolutionFinderResult<VulnerabilityPointEntity> GetDefault(ReportRequestVulnerabilityPointDto vulnerabilityPoint, IEnumerable<VulnerabilityPointEntity> foundedResolves)
+	{
+		return new SolutionFinderResult<VulnerabilityPointEntity>
+		{
+			Resolves = foundedResolves.Select(x =>
+				new SolutionFinderResultItem<VulnerabilityPointEntity>(vulnerabilityPoint.CveId, x, 0)).ToList()
+		};
 	}
 
 	private (string Query, bool IsPromptValid) GetQuery(string prompt, IIndexTokenizer tokenizer)

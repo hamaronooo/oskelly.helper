@@ -1,4 +1,5 @@
-﻿using KutCode.Cve.Application.Interfaces.Cve;
+﻿using System.Reflection;
+using KutCode.Cve.Application.Interfaces.Cve;
 using KutCode.Optionality;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -12,10 +13,42 @@ public sealed class CveResolverManager : ICveResolverManager
 		_scope = scopeFactory.CreateScope();
 	}
 
-	public Optional<ICveResolver> GetResolver(string resolverCode) => resolverCode switch
+	public Optional<ICveResolver> GetResolver(string resolverCode)
 	{
-		"msrc" => _scope.ServiceProvider.GetRequiredService<MicrosoftCveResolver>(),
-		"msrc_old" => _scope.ServiceProvider.GetRequiredService<MicrosoftOldCveResolver>(),
-		_ => Optional<ICveResolver>.None
-	};
+		foreach (var type in ResolverTypes)
+		{
+			var attributeData = GetResolverAttribute(type);
+			if (attributeData.HasValue is false) continue;
+			if (attributeData.Value!.Code.Equals(resolverCode.Trim()))
+			{
+				var providerResult = _scope.ServiceProvider.GetService(type);
+				if (providerResult is null || providerResult is not ICveResolver resolver)
+					continue;
+				return Optional.From(resolver);
+			} 
+		}
+		return Optional.None<ICveResolver>();
+	}
+
+	public IEnumerable<CveResolverListItem> GetResolversData()
+	{
+		foreach (var type in ResolverTypes) {
+			Attribute? attributeRaw = type.GetCustomAttribute(typeof(CveResolverAttribute));
+			if (attributeRaw is null) continue;
+			var attribute = (CveResolverAttribute) attributeRaw;
+			yield return new(attribute.Code, attribute.Name, attribute.Domain, attribute.Enabled);
+		}
+	}
+
+	private static Optional<CveResolverAttribute> GetResolverAttribute(Type resolverType)
+	{
+		Attribute? attributeRaw = resolverType.GetCustomAttribute(typeof(CveResolverAttribute));
+		if (attributeRaw is null || attributeRaw is not CveResolverAttribute result)
+			return Optional.None<CveResolverAttribute>();
+		return Optional.From(result);
+	}
+	
+	private static IEnumerable<Type> ResolverTypes =>  AppDomain.CurrentDomain.GetAssemblies()
+			.SelectMany(ass => ass.GetTypes())
+			.Where(t => typeof(ICveResolver).IsAssignableFrom(t));
 }
