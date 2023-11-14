@@ -34,6 +34,7 @@ public sealed class Endpoint : Endpoint<Request, Response>
 		var command = new ReportRequestExtendedDto() {
 			SearchStrategy = req.SearchStrategy,
 			SourcesRaw = req.ReduceSources(),
+			IsTranslate = req.IsTranslate,
 			Vulnerabilities = new () {
 				new () {
 					CveYear = cveId.Year, 

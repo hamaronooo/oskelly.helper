@@ -22,6 +22,8 @@ public interface ICveResolver
 /// <param name="Domain">Site where loading from domain name or something like that</param>
 /// <param name="Enabled">Is enabled for using</param>
 public sealed record CveResolverListItem(string Code, string Name, string? Domain = null, bool Enabled = true);
+
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct, AllowMultiple = false, Inherited = true)]
 public sealed class CveResolverAttribute : Attribute
 {
 	public string Code { get; }

@@ -10,13 +10,19 @@ public record ReportRequestDto
 	
 	public ReportRequestState State { get;init; }
 	public string StateName => EnumHelper.GetDescriptionValue(State);
+	
 	public ReportSearchStrategy SearchStrategy { get;init; }
 	public string SearchStrategyName => EnumHelper.GetDescriptionValue(SearchStrategy);
+
+	public bool IsTranslate { get; set; } = false;
+	
 	public DateTime? SysCreated { get;init; }
+	
 	/// <summary>
 	/// Сортировать вывод по CVE ID
 	/// </summary>
 	public bool IsReorder { get; set; } = false;
+	
 	/// <summary>
 	/// Resolver Code через разделитель ','
 	/// </summary>

@@ -12,6 +12,7 @@ public sealed class Request
 	public string? Software { get; set; }
 	public string? Platform { get; set; }
 	public ReportSearchStrategy SearchStrategy { get;set; }
+	public bool IsTranslate { get; set; } = false;
 	
 	/// <summary>
 	/// CVE-finders codes
