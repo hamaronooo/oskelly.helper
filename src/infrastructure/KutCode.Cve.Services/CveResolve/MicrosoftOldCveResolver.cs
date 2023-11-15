@@ -1,7 +1,6 @@
 ﻿using HtmlAgilityPack;
 using KutCode.Cve.Application.Interfaces.Cve;
 using KutCode.Cve.Domain;
-using KutCode.Cve.Services.ApiRepositories.Microsoft;
 using KutCode.Cve.Services.ApiRepositories.Mitre;
 using KutCode.Cve.Services.ApiRepositories.Mitre.Models;
 
@@ -13,21 +12,14 @@ namespace KutCode.Cve.Services.CveResolve;
 [CveResolver("msrc_old", "Устаревший репозиторий Microsoft (до 2018)", "learn.microsoft.com")]
 public sealed class MicrosoftOldCveResolver : ICveResolver
 {
-	private readonly MicrosoftSecurityApiRepository _msrcApi;
 	private readonly MitreApiRepository _mitreApi;
 
-	public MicrosoftOldCveResolver(
-		MicrosoftSecurityApiRepository msrcApi,
-		MitreApiRepository mitreApi)
-	{
-		_msrcApi = msrcApi;
-		_mitreApi = mitreApi;
-	}
+	public MicrosoftOldCveResolver(MitreApiRepository mitreApi) => _mitreApi = mitreApi;
 
 	public string Code => "msrc_old";
 	public Uri Uri => new("https://learn.microsoft.com/");
+	private HtmlWeb _web = new();
 
-	// todo: finish her
 	public async Task<IEnumerable<VulnerabilityPointEntity>> ResolveAsync(CveId cveId, CancellationToken ct = default)
 	{
 		var mitreCve = await _mitreApi.GetCveAsync(cveId, ct);
@@ -48,9 +40,7 @@ public sealed class MicrosoftOldCveResolver : ICveResolver
 
 	private async Task<IEnumerable<VulnerabilityPointEntity>> LoadAsync(Uri refUri, CveId cveId, MitreCveModel mitre)
 	{
-		HtmlWeb web = new();
-		HtmlDocument document = await web.LoadFromWebAsync(refUri.AbsoluteUri);
-
+		HtmlDocument document = await _web.LoadFromWebAsync(refUri.AbsoluteUri);
 		var resolves = new List<VulnerabilityPointEntity>();
 		
 		// main table

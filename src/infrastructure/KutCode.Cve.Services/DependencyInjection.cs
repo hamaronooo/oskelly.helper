@@ -29,8 +29,8 @@ public static class DependencyInjection
 		services.AddScoped<MitreApiRepository>();
 
 		// resolvers
-		services.AddScoped<MicrosoftCveResolver>();
-		services.AddScoped<MicrosoftOldCveResolver>();
+		foreach (var resolverType in CveResolverManager.ResolverTypes)
+			services.AddScoped(resolverType);
 		services.AddSingleton<ICveResolverManager, CveResolverManager>();
 		
 		services.AddScoped<ICveResolveQueueManager, CveResolveQueueManager>();

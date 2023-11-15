@@ -40,6 +40,11 @@ public sealed class CveResolverManager : ICveResolverManager
 		}
 	}
 
+	public static IEnumerable<Type> ResolverTypes => AppDomain.CurrentDomain.GetAssemblies()
+		.SelectMany(ass => ass.GetTypes())
+		.Where(t => typeof(ICveResolver).IsAssignableFrom(t))
+		.Where(t => t.IsInterface is false && t.IsAbstract is false);
+	
 	private static Optional<CveResolverAttribute> GetResolverAttribute(Type resolverType)
 	{
 		Attribute? attributeRaw = resolverType.GetCustomAttribute(typeof(CveResolverAttribute));
@@ -47,8 +52,4 @@ public sealed class CveResolverManager : ICveResolverManager
 			return Optional.None<CveResolverAttribute>();
 		return Optional.From(result);
 	}
-	
-	private static IEnumerable<Type> ResolverTypes =>  AppDomain.CurrentDomain.GetAssemblies()
-			.SelectMany(ass => ass.GetTypes())
-			.Where(t => typeof(ICveResolver).IsAssignableFrom(t));
 }
