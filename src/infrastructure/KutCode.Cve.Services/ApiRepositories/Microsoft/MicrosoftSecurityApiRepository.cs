@@ -17,7 +17,6 @@ public sealed class MicrosoftSecurityApiRepository
     public async Task<RestResponse<MicrosoftKbResponse>> GetCveDataAsync(CveId cveId, CancellationToken ct)
     {
         var request = new RestRequest(NewCveUrlTemplate.Replace("{cveCode}", cveId.AsStringWithoutPrefix));
-        var response = await _client.ExecuteGetAsync<MicrosoftKbResponse>(request, ct);
-        return response;
+        return await _client.ExecuteGetAsync<MicrosoftKbResponse>(request, ct);
     }
 }

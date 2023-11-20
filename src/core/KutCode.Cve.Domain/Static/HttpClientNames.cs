@@ -5,4 +5,5 @@ public sealed class HttpClientNames
 {
 	public const string Msrc = "msrc_a12bc812";
 	public const string Mitre = "mitre_12nhd7129";
+	public const string RedHat = "redhat_35adm689";
 }
