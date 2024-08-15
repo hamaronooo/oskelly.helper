@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Humanizer" Version="2.14.1" />
+      <PackageReference Include="RestSharp" Version="110.2.0" />
+      <PackageReference Include="RestSharp.Serializers.NewtonsoftJson" Version="110.2.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="config\create.txt" />
+      <Content Include="___config\create.txt">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+      <None Remove="config\remove.txt" />
+      <Content Include="___config\remove.txt">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </Content>
+    </ItemGroup>
+
+</Project>
