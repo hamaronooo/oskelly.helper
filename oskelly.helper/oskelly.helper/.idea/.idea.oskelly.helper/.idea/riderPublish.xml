@@ -4,6 +4,7 @@
     <option name="locations">
       <list>
         <option value="$PROJECT_DIR$/oskelly.helper/bin/publish" />
+        <option value="$PROJECT_DIR$/oskelly.helper/bin/publish/osx" />
       </list>
     </option>
   </component>

@@ -1,7 +1,8 @@
 ﻿using Humanizer;
 using oskelly.helper;
-using oskelly.helper.OskellyRespository.Models;
 using oskelly.helper.Settings;
+using oskelly.repository;
+using oskelly.repository.Models;
 using RestSharp;
 
 ConsoleHelper.WriteWelcome();
@@ -21,7 +22,7 @@ if (string.IsNullOrWhiteSpace(commentToCreate))
 	ConsoleHelper.ShowCreateCommentNotFound();
 
 RestResponse<AuthorizationResponse>? authResponse = null;
-var repo = new OskellyRepository();
+var repo = new OskellyRepository(OskellyRepositorySettings.Random);
 (string login, string password)? logPass = null;
 if (AppSettingsManager.Exists) {
 	Console.WriteLine("Using existed credentials!");

@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace oskelly.helper.OskellyRespository.Models;
+namespace oskelly.repository.Models;
 
 
 public class AuthorizationResponse

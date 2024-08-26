@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace oskelly.helper.OskellyRespository.Models.Catalog;
+namespace oskelly.repository.Models.Catalog;
 
 public class CatalogResponse
 {

@@ -1,6 +1,6 @@
 using Newtonsoft.Json;
 
-namespace oskelly.helper.OskellyRespository.Models.ProductData;
+namespace oskelly.repository.Models.ProductData;
 
 // root
 public class ProductDataResponse

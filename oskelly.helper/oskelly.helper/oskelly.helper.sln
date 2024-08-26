@@ -2,7 +2,13 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "oskelly.helper", "oskelly.helper\oskelly.helper.csproj", "{51E13B23-30D4-4C96-99B8-13A575C9980B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KafkaTest", "KafkaTest\KafkaTest.csproj", "{A5C22CB3-D5C2-42B8-BB91-C1A09FD2BC27}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "oskelly.repository", "oskelly.repository\oskelly.repository.csproj", "{428863FA-BBA8-4BA0-A407-229B4BA3BAFE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "oskelly.spamer", "oskelly.spamer\oskelly.spamer.csproj", "{F1661697-670E-4F8D-B01A-D3E1377F9E91}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "oskelly.test", "oskelly.test\oskelly.test.csproj", "{F4EA298E-D129-4196-BBC5-B20D88C31B44}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "comments.creator", "comments.creator\comments.creator.csproj", "{61EFAAB2-5993-4EC3-89F2-515E0292A000}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -14,9 +20,21 @@ Global
 		{51E13B23-30D4-4C96-99B8-13A575C9980B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{51E13B23-30D4-4C96-99B8-13A575C9980B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{51E13B23-30D4-4C96-99B8-13A575C9980B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A5C22CB3-D5C2-42B8-BB91-C1A09FD2BC27}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A5C22CB3-D5C2-42B8-BB91-C1A09FD2BC27}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A5C22CB3-D5C2-42B8-BB91-C1A09FD2BC27}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A5C22CB3-D5C2-42B8-BB91-C1A09FD2BC27}.Release|Any CPU.Build.0 = Release|Any CPU
+		{428863FA-BBA8-4BA0-A407-229B4BA3BAFE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{428863FA-BBA8-4BA0-A407-229B4BA3BAFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{428863FA-BBA8-4BA0-A407-229B4BA3BAFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{428863FA-BBA8-4BA0-A407-229B4BA3BAFE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F1661697-670E-4F8D-B01A-D3E1377F9E91}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F1661697-670E-4F8D-B01A-D3E1377F9E91}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F1661697-670E-4F8D-B01A-D3E1377F9E91}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F1661697-670E-4F8D-B01A-D3E1377F9E91}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F4EA298E-D129-4196-BBC5-B20D88C31B44}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F4EA298E-D129-4196-BBC5-B20D88C31B44}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F4EA298E-D129-4196-BBC5-B20D88C31B44}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F4EA298E-D129-4196-BBC5-B20D88C31B44}.Release|Any CPU.Build.0 = Release|Any CPU
+		{61EFAAB2-5993-4EC3-89F2-515E0292A000}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{61EFAAB2-5993-4EC3-89F2-515E0292A000}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{61EFAAB2-5993-4EC3-89F2-515E0292A000}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{61EFAAB2-5993-4EC3-89F2-515E0292A000}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -1,5 +1,5 @@
 using Humanizer;
-using oskelly.helper.OskellyRespository.Models;
+using oskelly.repository.Models;
 
 namespace oskelly.helper;
 

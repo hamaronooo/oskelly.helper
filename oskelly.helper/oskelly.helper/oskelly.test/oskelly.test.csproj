@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\comments.creator\comments.creator.csproj" />
+      <ProjectReference Include="..\oskelly.repository\oskelly.repository.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="asd\identities.txt" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="asd\" />
+    </ItemGroup>
+
+</Project>

@@ -1,34 +1,42 @@
 using Newtonsoft.Json;
-using oskelly.helper.OskellyRespository.Models;
-using oskelly.helper.OskellyRespository.Models.Catalog;
-using oskelly.helper.OskellyRespository.Models.ProductData;
+using oskelly.repository.Helpers;
+using oskelly.repository.Models;
+using oskelly.repository.Models.Catalog;
+using oskelly.repository.Models.ProductData;
+using oskelly.repository.Models.Register;
 using RestSharp;
 using RestSharp.Serializers.NewtonsoftJson;
+
+namespace oskelly.repository;
 
 public class OskellyRepository
 {
 	private readonly RestClient _client;
+	private readonly OskellyRepositorySettings _settings;
 	
-	public OskellyRepository()
+	public OskellyRepository(OskellyRepositorySettings settings)
 	{
-		_client = new RestClient(new RestClientOptions("https://oskelly.ru"),
+		_settings = settings;
+		_client = new RestClient(new RestClientOptions(settings.BaseUri),
 			configureDefaultHeaders: headers => {
-				headers.Add("sec-ch-ua", """Not)A;Brand";v="99", "Google Chrome";v="127", "Chromium";v="127""");
+				headers.Add("sec-ch-ua", $"""Not)A;Brand";v="{Random.Shared.Next(50, 100)}", "Google Chrome";v="{Random.Shared.Next(50, 150)}", "Chromium";v="{Random.Shared.Next(50, 150)}""");
 				headers.Add("sec-ch-ua-mobile", "?0");
-				headers.Add("sec-ch-ua-platform", "\"Windows\"");
+				headers.Add("sec-ch-ua-platform", $"\"{_settings.OperationSystem}\"");
 				headers.Add("sec-fetch-dest", "empty");
 				headers.Add("sec-fetch-mode", "cors");
 				headers.Add("sec-fetch-site", "same-origin");
-				headers.Add("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36");
+				headers.Add("user-agent", _settings.UserAgent);
 			},
 			configureSerialization: config => {
-			config.UseNewtonsoftJson(new JsonSerializerSettings {
-				Error = (sender, args) => {
-					args.ErrorContext.Handled = true;
-				}
+				config.UseNewtonsoftJson(new JsonSerializerSettings {
+					Error = (sender, args) => {
+						args.ErrorContext.Handled = true;
+					}
+				});
 			});
-		});
 	}
+	
+	
 	
 	public async Task<RestResponse<AuthorizationResponse>> AuthorizeAsync(string login, string password, CancellationToken ct = default)
 	{
@@ -36,16 +44,13 @@ public class OskellyRepository
 		req.AddQueryParameter("rawEmail", login);
 		req.AddQueryParameter("rawPassword", password);
 		var authResult = await _client.ExecutePostAsync<AuthorizationResponse>(req, ct);
-		if (authResult.Cookies?.Count > 0)
-			_client.AddDefaultHeaders(authResult.Cookies.ToDictionary(x => x.Name, z => z.Value));
-		// foreach (var header in authResult.Headers) {
-		// 	_client.AddDefaultHeaders();
-		// }
-		var newCookie = authResult.Headers.Where(x => x.Name.ToLower() == "set-cookie").Aggregate(string.Empty, (s, parameter) => s + "; " + parameter.Value);
-		_client.AddDefaultHeader("Cookie", newCookie);
+		if (authResult.IsSuccessful)
+			_client.SetHeadersFromResponse(authResult);
 		return authResult;
 	}
-	
+
+
+
 	public async Task<RestResponse<CatalogResponse>> GetSellerProductsAsync(
 		int sellerId, int page = 1, int pageLength = 200,
 		string state = "PUBLISHED", CancellationToken ct = default)
@@ -78,4 +83,30 @@ public class OskellyRepository
 		var req = new RestRequest($"api/v2/comments/{commentId}", Method.Delete);
 		return await _client.ExecuteAsync(req, ct);
 	}
+	
+	/// <summary>
+	/// Register new user and set cookies if success
+	/// </summary>
+	public async Task<RestResponse<RegisterResponse>> RegisterAsync(RegisterRequest request, CancellationToken ct = default)
+	{
+		var req = new RestRequest($"api/v2/account/register", Method.Post);
+		req.AddHeader(KnownHeaders.ContentType, "application/x-www-form-urlencoded; charset=UTF-8");
+		req.AddParameter("application/x-www-form-urlencoded", 
+			$"registerNickname={request.RegisterNickname}" +
+			$"&registerEmail={request.RegisterEmail}" +
+			$"&registerPassword={request.RegisterPassword}&registerConfirmPassword={request.RegisterPassword}" +
+			$"&subscriptionApprove={request.SubscriptionApprove}",
+			ParameterType.RequestBody);
+
+		var result = await _client.ExecuteAsync<RegisterResponse>(req, ct);
+		if (result.IsSuccessful)
+			_client.SetHeadersFromResponse(result);
+		return result;
+	}
+
+	public Task<RestResponse<string>> CheckIpAsync()
+	{
+		return _client.ExecuteGetAsync<string>("https://api.ipify.org/");
+	}
+	
 }
