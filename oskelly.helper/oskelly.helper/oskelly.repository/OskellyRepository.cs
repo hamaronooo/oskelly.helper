@@ -1,3 +1,4 @@
+using System.Net;
 using Newtonsoft.Json;
 using oskelly.repository.Helpers;
 using oskelly.repository.Models;
@@ -73,7 +74,11 @@ public class OskellyRepository
 	
 	public async Task<RestResponse> CreateCommentAsync(string commentText, int productId, CancellationToken ct = default)
 	{
+		var data = new byte[4];
+		new Random().NextBytes(data);
+		IPAddress ip = new IPAddress(data);
 		var req = new RestRequest($"api/v2/comments/base64-images", Method.Post);
+		req.AddHeader("x-forwarded-for", ip.ToString());
 		req.AddJsonBody(new { productId, text = commentText, imagesBase64 = ArraySegment<string>.Empty });
 		return await _client.ExecuteAsync<AuthorizationResponse>(req, ct);
 	}
